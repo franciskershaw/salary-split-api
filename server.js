@@ -4,6 +4,7 @@ const connectDB = require('./config/db');
 require('colors');
 const { errorHandler } = require('./middleware/errorMiddleware');
 const cookieParser = require('cookie-parser');
+const cors = require('cors');
 
 // Grab port info from config
 const PORT = process.env.PORT || 5300;
@@ -17,6 +18,13 @@ app.use(express.json());
 
 // Cookie parser
 app.use(cookieParser());
+
+// Cors
+app.use(
+  cors({
+    origin: process.env.CORS_ORIGIN,
+  })
+);
 
 // Routes
 app.use('/api/users', require('./routes/userRoutes'));
