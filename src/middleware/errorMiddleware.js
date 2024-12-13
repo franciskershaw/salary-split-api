@@ -1,10 +1,10 @@
 const { UnauthorizedError } = require("../errors/errors");
-// const moment = require('moment')
+const moment = require("moment");
 
 const errorHandler = (err, req, res, next) => {
-  // if (process.env.NODE_ENV === 'development') {
-  //   console.log(moment().format('MMMM Do YYYY, h:mm:ss a'), err);
-  // }
+  if (process.env.NODE_ENV === "development") {
+    console.log(moment().format("MMMM Do YYYY, h:mm:ss a"), err);
+  }
 
   const statusCode = err.statusCode || 500;
   let message = err.message;
