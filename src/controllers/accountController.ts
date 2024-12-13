@@ -1,17 +1,20 @@
-const Account = require('../models/Account');
-const User = require('../models/User');
-const Transaction = require('../models/Transaction');
-const {
+// @ts-nocheck
+
+import { Request, Response, NextFunction } from "express";
+import Account from "../models/Account";
+import User, { IUser } from "../models/User";
+import Transaction from "../models/Transaction";
+import {
   addAccountSchema,
   updateAccountSchema,
-} = require('../validation/joiSchemas');
-const {
+} from "../validation/joiSchemas";
+import {
   BadRequestError,
   ConflictError,
   NotFoundError,
-} = require('../errors/errors');
+} from "../errors/errors";
 
-const getAccounts = async (req, res, next) => {
+const getAccounts = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { accounts: accountIds } = await User.findById(req.user._id);
     const accounts = await Account.find({ _id: { $in: accountIds } });
@@ -21,7 +24,7 @@ const getAccounts = async (req, res, next) => {
   }
 };
 
-const addAccount = async (req, res, next) => {
+const addAccount = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { error, value } = addAccountSchema.validate(req.body);
     if (error) {
@@ -42,13 +45,16 @@ const addAccount = async (req, res, next) => {
       Make sure first account added is the 'default' account
       and therefore accepts funds
     */
+
     const user = await User.findById(req.user._id);
+
     if (user.accounts < 1 && acceptsFunds === false) {
-      throw new BadRequestError('Your default account must accept funds');
+      throw new BadRequestError("Your default account must accept funds");
     }
 
     const account = new Account({
       name,
+
       user: req.user._id,
       amount,
       acceptsFunds,
@@ -58,6 +64,7 @@ const addAccount = async (req, res, next) => {
     await account.save();
 
     // Sets the default account if this is the first account added
+
     if (user.accounts < 1) {
       user.defaultAccount = account._id;
     }
@@ -71,12 +78,12 @@ const addAccount = async (req, res, next) => {
   }
 };
 
-const editAccount = async (req, res, next) => {
+const editAccount = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const account = await Account.findById(req.params.accountId);
 
     if (!account) {
-      throw new NotFoundError('Account not found');
+      throw new NotFoundError("Account not found");
     }
 
     /* 
@@ -111,7 +118,7 @@ const editAccount = async (req, res, next) => {
       user.defaultAccount.equals(req.params.accountId) &&
       value.acceptsFunds === false
     ) {
-      throw new BadRequestError('Default account must accept funds');
+      throw new BadRequestError("Default account must accept funds");
     }
 
     // Finally, if everything else has passed, update the account
@@ -127,18 +134,23 @@ const editAccount = async (req, res, next) => {
   }
 };
 
-const deleteAccount = async (req, res, next) => {
+const deleteAccount = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { accountId } = req.params;
     const account = await Account.findById(accountId);
     if (!account) {
-      throw NotFoundError('Account not found');
+      throw new NotFoundError("Account not found");
     }
 
     // Do not allow default accounts to be deleted
+
     const user = await User.findById(req.user._id);
     if (user.defaultAccount.equals(accountId)) {
-      throw new BadRequestError('Cannot delete default account');
+      throw new BadRequestError("Cannot delete default account");
     }
 
     /*
@@ -175,4 +187,4 @@ const deleteAccount = async (req, res, next) => {
   }
 };
 
-module.exports = { getAccounts, addAccount, editAccount, deleteAccount };
+export { getAccounts, addAccount, editAccount, deleteAccount };

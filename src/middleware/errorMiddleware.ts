@@ -1,7 +1,13 @@
-const { UnauthorizedError } = require("../errors/errors");
-const moment = require("moment");
+import { Request, Response, NextFunction } from "express";
+import { UnauthorizedError } from "../errors/errors";
+import moment from "moment";
 
-const errorHandler = (err, req, res, next) => {
+const errorHandler = (
+  err: any,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   if (process.env.NODE_ENV === "development") {
     console.log(moment().format("MMMM Do YYYY, h:mm:ss a"), err);
   }
@@ -27,6 +33,4 @@ const errorHandler = (err, req, res, next) => {
   }
 };
 
-module.exports = {
-  errorHandler,
-};
+export { errorHandler };

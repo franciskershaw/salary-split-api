@@ -1,17 +1,24 @@
-const Transaction = require('../models/Transaction');
-const User = require('../models/User');
-const Account = require('../models/Account');
-const {
+// @ts-nocheck
+
+import { Request, Response, NextFunction } from "express";
+import Transaction from "../models/Transaction";
+import User from "../models/User";
+import Account from "../models/Account";
+import {
   addTransactionSchema,
   updateTransactionSchema,
-} = require('../validation/joiSchemas');
-const {
+} from "../validation/joiSchemas";
+import {
   BadRequestError,
   ConflictError,
   NotFoundError,
-} = require('../errors/errors');
+} from "../errors/errors";
 
-const getTransactions = async (req, res, next) => {
+const getTransactions = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { transactions: transactionIds } = await User.findById(req.user._id);
     const transactions = await Transaction.find({
@@ -23,7 +30,11 @@ const getTransactions = async (req, res, next) => {
   }
 };
 
-const addTransaction = async (req, res, next) => {
+const addTransaction = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { error, value } = addTransactionSchema.validate(req.body);
     if (error) {
@@ -45,7 +56,7 @@ const addTransaction = async (req, res, next) => {
     // Make sure user is not creating transaction with invalid 'sendToAccount'
     const account = await Account.findById(sendToAccount);
     if (!account.acceptsFunds) {
-      throw new BadRequestError('This account does not accept funds directly');
+      throw new BadRequestError("This account does not accept funds directly");
     }
 
     const transaction = new Transaction({
@@ -68,12 +79,16 @@ const addTransaction = async (req, res, next) => {
   }
 };
 
-const editTransaction = async (req, res, next) => {
+const editTransaction = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const transaction = await Transaction.findById(req.params.transactionId);
 
     if (!transaction) {
-      throw new NotFoundError('Transaction not found');
+      throw new NotFoundError("Transaction not found");
     }
 
     const { error, value } = updateTransactionSchema.validate(req.body);
@@ -86,7 +101,7 @@ const editTransaction = async (req, res, next) => {
       const account = await Account.findById(req.body.sendToAccount);
       if (!account.acceptsFunds) {
         throw new BadRequestError(
-          'This account does not accept funds directly'
+          "This account does not accept funds directly"
         );
       }
     }
@@ -103,12 +118,16 @@ const editTransaction = async (req, res, next) => {
   }
 };
 
-const deleteTransaction = async (req, res, next) => {
+const deleteTransaction = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { transactionId } = req.params;
     const transaction = await Transaction.findById(transactionId);
     if (!transaction) {
-      throw NotFoundError('Transaction not found');
+      throw new NotFoundError("Transaction not found");
     }
     await Transaction.findByIdAndDelete(transactionId);
 
@@ -126,9 +145,4 @@ const deleteTransaction = async (req, res, next) => {
   }
 };
 
-module.exports = {
-  getTransactions,
-  addTransaction,
-  editTransaction,
-  deleteTransaction,
-};
+export { getTransactions, addTransaction, editTransaction, deleteTransaction };

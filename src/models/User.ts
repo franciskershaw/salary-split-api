@@ -1,6 +1,16 @@
-const mongoose = require('mongoose');
+import mongoose from "mongoose";
 
-const UserSchema = mongoose.Schema({
+export interface IUser {
+  username: string;
+  name: string;
+  password: string;
+  monthlySalary: number;
+  transactions: mongoose.Schema.Types.ObjectId[];
+  accounts: mongoose.Schema.Types.ObjectId[];
+  defaultAccount: mongoose.Schema.Types.ObjectId;
+}
+
+const UserSchema = new mongoose.Schema<IUser>({
   username: {
     type: String,
     required: true,
@@ -22,19 +32,21 @@ const UserSchema = mongoose.Schema({
   transactions: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Transaction',
+      ref: "Transaction",
     },
   ],
   accounts: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Account',
+      ref: "Account",
     },
   ],
   defaultAccount: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Account',
+    ref: "Account",
   },
 });
 
-module.exports = mongoose.model('User', UserSchema);
+const User = mongoose.model<IUser>("User", UserSchema);
+
+export default User;

@@ -1,4 +1,4 @@
-const Joi = require('joi');
+import Joi from "joi";
 
 const createUserSchema = Joi.object({
   username: Joi.string().max(30).required().regex(/^\S+$/),
@@ -32,7 +32,7 @@ const updateAccountSchema = Joi.object({
   excludeFromTotal: Joi.boolean().optional(),
 })
   .min(1)
-  .or('name', 'amount', 'acceptsFunds', 'excludeFromTotal');
+  .or("name", "amount", "acceptsFunds", "excludeFromTotal");
 
 const addTransactionSchema = Joi.object({
   name: Joi.string().required(),
@@ -40,7 +40,7 @@ const addTransactionSchema = Joi.object({
   sendToAccount: Joi.string()
     .regex(/^[0-9a-fA-F]{24}$/)
     .required(),
-  type: Joi.string().valid('bill', 'savings').required(),
+  type: Joi.string().valid("bill", "savings").required(),
 });
 
 const updateTransactionSchema = Joi.object({
@@ -49,12 +49,12 @@ const updateTransactionSchema = Joi.object({
   sendToAccount: Joi.string()
     .regex(/^[0-9a-fA-F]{24}$/)
     .optional(),
-  type: Joi.string().valid('bill', 'savings').optional(),
+  type: Joi.string().valid("bill", "savings").optional(),
 })
   .min(1)
-  .or('name', 'amount', 'sendToAccount', 'type');
+  .or("name", "amount", "sendToAccount", "type");
 
-module.exports = {
+export {
   createUserSchema,
   loginUserSchema,
   editUserSchema,

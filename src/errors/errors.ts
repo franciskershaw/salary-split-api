@@ -1,12 +1,15 @@
 class BadRequestError extends Error {
-  constructor(message) {
+  statusCode: number;
+  constructor(message: string) {
     super(message);
     this.statusCode = 400;
   }
 }
 
 class UnauthorizedError extends Error {
-  constructor(message, errorCode) {
+  statusCode: number;
+  errorCode?: string | number;
+  constructor(message: string, errorCode?: string | number) {
     super(message);
     this.statusCode = 401;
     this.errorCode = errorCode;
@@ -14,41 +17,46 @@ class UnauthorizedError extends Error {
 }
 
 class NotFoundError extends Error {
-  constructor(message) {
+  statusCode: number;
+  constructor(message: string) {
     super(message);
     this.statusCode = 404;
   }
 }
 
 class ForbiddenError extends Error {
-  constructor(message) {
+  statusCode: number;
+  constructor(message: string) {
     super(message);
     this.statusCode = 403;
   }
 }
 
 class ConflictError extends Error {
-  constructor(message) {
+  statusCode: number;
+  constructor(message: string) {
     super(message);
     this.statusCode = 409;
   }
 }
 
 class InternalServerError extends Error {
-  constructor(message) {
+  statusCode: number;
+  constructor(message: string) {
     super(message);
     this.statusCode = 500;
   }
 }
 
 class ServiceUnavailableError extends Error {
-  constructor(message) {
+  statusCode: number;
+  constructor(message: string) {
     super(message);
     this.statusCode = 503;
   }
 }
 
-module.exports = {
+export {
   BadRequestError,
   UnauthorizedError,
   ForbiddenError,

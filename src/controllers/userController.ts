@@ -1,23 +1,26 @@
-const bcrypt = require('bcryptjs');
-const {
+// @ts-nocheck
+
+import { Request, Response, NextFunction } from "express";
+import bcrypt from "bcryptjs";
+import {
   generateAccessToken,
   generateRefreshToken,
   verifyToken,
-} = require('../helper/helper');
-const {
+} from "../helper/helper";
+import {
   BadRequestError,
   ConflictError,
   UnauthorizedError,
-} = require('../errors/errors');
-const {
+} from "../errors/errors";
+import {
   createUserSchema,
   loginUserSchema,
   editUserSchema,
-} = require('../validation/joiSchemas');
-const User = require('../models/User');
-const Account = require('../models/Account');
+} from "../validation/joiSchemas";
+import User from "../models/User";
+import Account from "../models/Account";
 
-const createUser = async (req, res, next) => {
+const createUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { error, value } = createUserSchema.validate(req.body);
     if (error) {
@@ -29,7 +32,7 @@ const createUser = async (req, res, next) => {
     // Check user doesn't already exist
     const userExists = await User.findOne({ username });
     if (userExists) {
-      throw new ConflictError('User already exists');
+      throw new ConflictError("User already exists");
     }
     // salt and hash password
     const salt = await bcrypt.genSalt(10);
@@ -45,7 +48,7 @@ const createUser = async (req, res, next) => {
 
     // Send refresh token
     const refreshToken = generateRefreshToken(user._id);
-    res.cookie('refreshToken', refreshToken, {
+    res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
     });
@@ -68,7 +71,7 @@ const createUser = async (req, res, next) => {
   }
 };
 
-const loginUser = async (req, res, next) => {
+const loginUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { error, value } = loginUserSchema.validate(req.body);
     if (error) {
@@ -79,17 +82,17 @@ const loginUser = async (req, res, next) => {
     // Check username exists
     const user = await User.findOne({ username });
     if (!user) {
-      throw new BadRequestError('Username or password is incorrect');
+      throw new BadRequestError("Username or password is incorrect");
     }
     // Check password is correct
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      throw new BadRequestError('Username or password is incorrect');
+      throw new BadRequestError("Username or password is incorrect");
     }
 
     // Send refresh token
     const refreshToken = generateRefreshToken(user._id);
-    res.cookie('refreshToken', refreshToken, {
+    res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
     });
@@ -112,11 +115,11 @@ const loginUser = async (req, res, next) => {
   }
 };
 
-const checkRefreshToken = (req, res) => {
+const checkRefreshToken = (req: Request, res: Response) => {
   const cookies = req.cookies;
 
   if (!cookies?.refreshToken)
-    throw new UnauthorizedError('No refresh token', 'NO_TOKEN');
+    throw new UnauthorizedError("No refresh token", "NO_TOKEN");
 
   const refreshToken = cookies.refreshToken;
   try {
@@ -124,17 +127,17 @@ const checkRefreshToken = (req, res) => {
     const accessToken = generateAccessToken(_id);
     res.json({ accessToken: accessToken, _id });
   } catch (error) {
-    res.clearCookie('refreshToken');
-    throw new UnauthorizedError('Issues validating the token', 'INVALID_TOKEN');
+    res.clearCookie("refreshToken");
+    throw new UnauthorizedError("Issues validating the token", "INVALID_TOKEN");
   }
 };
 
-const logoutUser = (req, res) => {
-  res.clearCookie('refreshToken');
-  res.status(200).json({ message: 'User logged out' });
+const logoutUser = (req: Request, res: Response) => {
+  res.clearCookie("refreshToken");
+  res.status(200).json({ message: "User logged out" });
 };
 
-const getUserInfo = async (req, res, next) => {
+const getUserInfo = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const user = await User.findById(req.user._id);
     res.status(200).json({
@@ -154,7 +157,7 @@ const getUserInfo = async (req, res, next) => {
   }
 };
 
-const editUser = async (req, res, next) => {
+const editUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { error, value } = editUserSchema.validate(req.body);
     if (error) {
@@ -168,7 +171,7 @@ const editUser = async (req, res, next) => {
     if (value.defaultAccount) {
       const account = await Account.findById(value.defaultAccount);
       if (account.acceptsFunds === false) {
-        throw new BadRequestError('A default account must accept funds');
+        throw new BadRequestError("A default account must accept funds");
       }
     }
 
@@ -181,7 +184,7 @@ const editUser = async (req, res, next) => {
   }
 };
 
-module.exports = {
+export {
   createUser,
   loginUser,
   checkRefreshToken,

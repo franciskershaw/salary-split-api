@@ -1,13 +1,21 @@
-const mongoose = require('mongoose');
+import mongoose from "mongoose";
 
-const AccountSchema = mongoose.Schema({
+export interface IAccount {
+  name: string;
+  user: mongoose.Schema.Types.ObjectId;
+  amount: number;
+  acceptsFunds: boolean;
+  excludeFromTotal: boolean;
+}
+
+const AccountSchema = new mongoose.Schema<IAccount>({
   name: {
     type: String,
     required: true,
   },
   user: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
+    ref: "User",
     required: true,
   },
   amount: {
@@ -26,4 +34,6 @@ const AccountSchema = mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model('Account', AccountSchema);
+const Account = mongoose.model<IAccount>("Account", AccountSchema);
+
+export default Account;
