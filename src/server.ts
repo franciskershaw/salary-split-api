@@ -10,7 +10,7 @@ import "colors";
 // import authRoutes from "./features/auth/auth.routes";
 // import userRoutes from "./features/users/user.routes";
 import connectDb from "./core/config/database";
-// import { errorHandler } from "./core/middleware/error.middleware";
+import { errorHandler } from "./core/middleware/error.middleware";
 
 const isNetworkDevelopmentMode =
   process.env.NODE_ENV === "development" && process.argv.includes("--host");
@@ -59,7 +59,7 @@ app.get("/", (_, res) => {
 });
 
 // Error handler
-// app.use(errorHandler);
+app.use(errorHandler);
 
 // Connect to DB and start the server
 connectDb()
