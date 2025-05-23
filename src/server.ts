@@ -6,9 +6,9 @@ import cookieParser from "cookie-parser";
 import helmet from "helmet";
 import cors from "cors";
 import "colors";
-// import passport from "./core/config/passport";
-// import authRoutes from "./features/auth/auth.routes";
-// import userRoutes from "./features/users/user.routes";
+import passport from "./core/config/passport";
+import authRoutes from "./features/auth/routes/_auth.routes";
+import userRoutes from "./features/users/routes/_user.routes";
 import connectDb from "./core/config/database";
 import { errorHandler } from "./core/middleware/error.middleware";
 
@@ -49,10 +49,11 @@ app.use(
 );
 
 // // Passport / Auth
-// app.use(passport.initialize());
+app.use(passport.initialize());
 
 // Routes
-// app.use("/api/users", userRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/auth", authRoutes);
 
 app.get("/", (_, res) => {
   res.status(200).json({ message: "Welcome to the Salary Split API" });

@@ -44,7 +44,6 @@ const UserSchema = new mongoose.Schema(
       },
       lastName: {
         type: String,
-        required: [true, "Please provide a last name"],
       },
     },
     role: {
@@ -63,7 +62,6 @@ const UserSchema = new mongoose.Schema(
     },
     payDay: {
       type: String,
-      required: [true, "Please provide your pay day"],
     },
     defaultCurrency: {
       type: String,
