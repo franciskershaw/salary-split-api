@@ -23,7 +23,7 @@ const sendTokensAndUser = async (
     REFRESH_TOKEN_COOKIE_OPTIONS
   );
 
-  res.status(status).json({ user, accessToken });
+  res.status(status).json({ ...user, accessToken });
 };
 
 export { sendTokensAndUser };

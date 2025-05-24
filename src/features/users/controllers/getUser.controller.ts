@@ -5,13 +5,13 @@ import { sendTokensAndUser } from "../../auth/utils/auth.helper";
 
 const getUserInfo = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const user = await User.findById((req.user as IUser)._id);
+    const user = await User.findById((req.user as IUser)._id).lean();
 
     if (!user) {
       throw new NotFoundError("User not found");
     }
 
-    sendTokensAndUser(res, user);
+    sendTokensAndUser(res, user as IUser);
   } catch (err) {
     next(err);
   }
