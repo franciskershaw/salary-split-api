@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import updateSalarySchema from "../validation/salary.user.validation";
 import User, { IUser } from "../model/user.model";
 import validateRequest from "../../../core/utils/validate";
+import { NotFoundError } from "../../../core/utils/errors";
 
 const updateSalary = async (
   req: Request,
@@ -18,9 +19,15 @@ const updateSalary = async (
       { takeHomePay: salary },
       { new: true }
     );
-    res
-      .status(200)
-      .json({ message: "Salary updated successfully", user: updatedUser });
+
+    if (!updatedUser) {
+      throw new NotFoundError("User not found");
+    }
+
+    res.status(200).json({
+      message: "Salary updated successfully",
+      takeHomePay: updatedUser.takeHomePay,
+    });
   } catch (error) {
     next(error);
   }
