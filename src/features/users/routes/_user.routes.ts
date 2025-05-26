@@ -7,4 +7,10 @@ const router = express.Router();
 
 router.get("/", authenticateToken, asyncHandler(userController.getUser));
 
+router.patch(
+  "/salary",
+  authenticateToken,
+  asyncHandler(userController.updateSalary)
+);
+
 export default router;

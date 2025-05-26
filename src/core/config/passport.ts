@@ -85,7 +85,7 @@ passport.use(
     { usernameField: "email", passwordField: "password" },
     async (email, password, done) => {
       try {
-        const user = await User.findOne({ email }).select("+password");
+        const user = await User.findOne({ email }).select("+password").lean();
         if (!user || !user.password) {
           return done(null, false, { message: "Invalid email or password" });
         }
@@ -95,7 +95,9 @@ passport.use(
           return done(null, false, { message: "Invalid email or password" });
         }
 
-        return done(null, user);
+        // Remove password from the user object before returning
+        const { password: _, ...userWithoutPassword } = user;
+        return done(null, userWithoutPassword);
       } catch (error) {
         return done(error);
       }
