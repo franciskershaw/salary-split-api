@@ -15,6 +15,7 @@ export interface IUser extends Document {
   payDay: string;
   defaultCurrency: "GBP" | "USD" | "EUR";
   defaultTheme: "light" | "dark";
+  defaultAccount?: mongoose.Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -62,6 +63,10 @@ const UserSchema = new mongoose.Schema(
     },
     payDay: {
       type: String,
+    },
+    defaultAccount: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Account",
     },
     defaultCurrency: {
       type: String,
