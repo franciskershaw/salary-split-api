@@ -1,3 +1,4 @@
+import addAccount from "./addAccount.controller";
 import getAccounts from "./getAccounts.controller";
 
-export { getAccounts };
+export { addAccount, getAccounts };
