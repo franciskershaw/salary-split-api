@@ -62,7 +62,7 @@ const addAccount = async (req: Request, res: Response, next: NextFunction) => {
         await session.commitTransaction();
       } catch (err) {
         await session.abortTransaction();
-        next(err);
+        throw err;
       } finally {
         session.endSession();
       }
