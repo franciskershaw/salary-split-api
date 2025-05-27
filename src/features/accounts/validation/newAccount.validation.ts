@@ -22,7 +22,7 @@ const newAccountSchema = Joi.object({
       "any.only":
         "Account type must be one of: current, savings, investment, or joint.",
     }),
-  institution: Joi.string().messages({
+  institution: Joi.string().allow("").messages({
     "string.base": "Institution must be a string.",
   }),
 });
