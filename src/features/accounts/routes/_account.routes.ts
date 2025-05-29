@@ -12,5 +12,10 @@ router.put(
   authenticateToken,
   asyncHandler(accountController.editAccount)
 );
+router.delete(
+  "/:accountId",
+  authenticateToken,
+  asyncHandler(accountController.deleteAccount)
+);
 
 export default router;
