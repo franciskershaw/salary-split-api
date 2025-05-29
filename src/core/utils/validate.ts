@@ -6,16 +6,10 @@ const validateRequest = <T>(payload: unknown, schema: Schema<T>): T => {
     throw new BadRequestError("Request body is required");
   }
 
-  const { value, error } = schema.validate(payload, {
-    abortEarly: false,
-    stripUnknown: true,
-  });
+  const { value, error } = schema.validate(payload);
 
   if (error) {
-    const errorMessage = error.details
-      .map((detail) => detail.message)
-      .join(", ");
-    throw new BadRequestError(errorMessage);
+    throw new BadRequestError(error.details[0].message);
   }
 
   return value as T;

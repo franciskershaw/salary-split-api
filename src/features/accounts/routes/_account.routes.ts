@@ -7,5 +7,10 @@ const router = express.Router();
 
 router.get("/", authenticateToken, asyncHandler(accountController.getAccounts));
 router.post("/", authenticateToken, asyncHandler(accountController.addAccount));
+router.put(
+  "/:accountId",
+  authenticateToken,
+  asyncHandler(accountController.editAccount)
+);
 
 export default router;
