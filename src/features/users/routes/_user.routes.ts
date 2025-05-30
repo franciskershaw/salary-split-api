@@ -13,4 +13,10 @@ router.patch(
   asyncHandler(userController.updateSalary)
 );
 
+router.put(
+  "/account-filters",
+  authenticateToken,
+  asyncHandler(userController.updateAccountFilters)
+);
+
 export default router;
