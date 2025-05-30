@@ -5,7 +5,9 @@ import { IUser } from "../../users/model/user.model";
 const getAccounts = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const user = req.user as IUser;
-    const accounts = await Account.find({ createdBy: user._id });
+    const accounts = await Account.find({ createdBy: user._id }).sort({
+      order: 1,
+    });
     res.status(200).json(accounts);
   } catch (err) {
     next(err);

@@ -43,6 +43,10 @@ const AccountSchema = new mongoose.Schema(
       required: true,
       default: ACCOUNT_TYPES.CURRENT,
     },
+    order: {
+      type: Number,
+      required: true,
+    },
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
