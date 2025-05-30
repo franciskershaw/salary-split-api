@@ -2,6 +2,16 @@
 export const GOOGLE_PROVIDER = "google";
 export const LOCAL_PROVIDER = "local";
 
+// Account Types
+export const ACCOUNT_TYPES = {
+  CURRENT: "current",
+  SAVINGS: "savings",
+  INVESTMENT: "investment",
+  JOINT: "joint",
+} as const;
+
+export type AccountType = (typeof ACCOUNT_TYPES)[keyof typeof ACCOUNT_TYPES];
+
 // Cookie
 export const REFRESH_TOKEN_COOKIE_NAME = "refreshToken";
 export const REFRESH_TOKEN_COOKIE_OPTIONS = {

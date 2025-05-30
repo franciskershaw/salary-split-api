@@ -1,4 +1,5 @@
 import mongoose, { Document, Model } from "mongoose";
+import { AccountType, ACCOUNT_TYPES } from "../../../core/utils/constants";
 
 export interface IAccount extends Document {
   _id: mongoose.Types.ObjectId;
@@ -7,7 +8,7 @@ export interface IAccount extends Document {
   amount: number;
   acceptsFunds: boolean;
   receivesSalary?: boolean;
-  type: "current" | "savings" | "investment" | "joint";
+  type: AccountType;
   createdBy: mongoose.Types.ObjectId;
   createdAt: Date;
 }
@@ -38,9 +39,9 @@ const AccountSchema = new mongoose.Schema(
     },
     type: {
       type: String,
-      enum: ["current", "savings", "investment", "joint"],
+      enum: Object.values(ACCOUNT_TYPES),
       required: true,
-      default: "current",
+      default: ACCOUNT_TYPES.CURRENT,
     },
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,

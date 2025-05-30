@@ -1,4 +1,5 @@
 import mongoose, { Document, Model } from "mongoose";
+import { AccountType, ACCOUNT_TYPES } from "../../../core/utils/constants";
 
 export interface IUser extends Document {
   _id: mongoose.Types.ObjectId;
@@ -16,6 +17,10 @@ export interface IUser extends Document {
   defaultCurrency: "GBP" | "USD" | "EUR";
   defaultTheme: "light" | "dark";
   defaultAccount?: mongoose.Types.ObjectId;
+  accountFilters?: {
+    type: AccountType;
+    enabled: boolean;
+  }[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -78,6 +83,20 @@ const UserSchema = new mongoose.Schema(
       enum: ["light", "dark"],
       default: "light",
     },
+    accountFilters: [
+      {
+        type: {
+          type: String,
+          enum: Object.values(ACCOUNT_TYPES),
+          required: true,
+        },
+        enabled: {
+          type: Boolean,
+          required: true,
+          default: true,
+        },
+      },
+    ],
   },
   { timestamps: true }
 );
