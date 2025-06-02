@@ -9,8 +9,11 @@ const newBillSchema = Joi.object({
     "number.base": "Amount must be a number.",
     "any.required": "Amount is required.",
   }),
-  dueDate: Joi.string().required().messages({
-    "string.empty": "Please provide a due date.",
+  dueDate: Joi.number().integer().min(1).max(31).required().messages({
+    "number.base": "Due date must be a number.",
+    "number.integer": "Due date must be a whole number.",
+    "number.min": "Due date must be at least 1.",
+    "number.max": "Due date cannot be more than 31.",
     "any.required": "Due date is required.",
   }),
   account: Joi.string().required().messages({

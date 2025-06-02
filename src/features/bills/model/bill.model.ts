@@ -4,7 +4,7 @@ export interface IBill extends Document {
   _id: mongoose.Types.ObjectId;
   name: string;
   amount: number;
-  dueDate: string;
+  dueDate: number;
   account: mongoose.Types.ObjectId;
   splitBetween?: number;
   createdBy: mongoose.Types.ObjectId;
@@ -24,8 +24,14 @@ const BillSchema = new mongoose.Schema(
       required: true,
     },
     dueDate: {
-      type: String,
+      type: Number,
       required: true,
+      min: 1,
+      max: 31,
+      validate: {
+        validator: Number.isInteger,
+        message: "Due date must be a whole number.",
+      },
     },
     account: {
       type: mongoose.Schema.Types.ObjectId,
