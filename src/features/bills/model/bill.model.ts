@@ -7,6 +7,7 @@ export interface IBill extends Document {
   dueDate: number;
   account: mongoose.Types.ObjectId;
   splitBetween?: number;
+  order?: number;
   createdBy: mongoose.Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
@@ -46,6 +47,9 @@ const BillSchema = new mongoose.Schema(
         validator: Number.isInteger,
         message: "Split between must be a whole number.",
       },
+    },
+    order: {
+      type: Number,
     },
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
