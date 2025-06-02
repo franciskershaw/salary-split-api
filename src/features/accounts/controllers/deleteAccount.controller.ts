@@ -6,6 +6,7 @@ import {
   NotFoundError,
 } from "../../../core/utils/errors";
 import User from "../../users/model/user.model";
+import Bill from "../../bills/model/bill.model";
 
 const deleteAccount = async (
   req: Request,
@@ -32,6 +33,13 @@ const deleteAccount = async (
 
     if (account.createdBy.toString() !== user._id.toString()) {
       throw new ForbiddenError("You are not authorized to delete this account");
+    }
+
+    const bills = await Bill.find({ account: accountId });
+    if (bills.length > 0) {
+      throw new BadRequestError(
+        "Account is linked to a bill, please change the account on the bill before deleting"
+      );
     }
 
     await Account.findByIdAndDelete(accountId);
