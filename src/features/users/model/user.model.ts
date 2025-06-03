@@ -1,5 +1,9 @@
 import mongoose, { Document, Model } from "mongoose";
-import { AccountType, ACCOUNT_TYPES } from "../../../core/utils/constants";
+import {
+  AccountType,
+  ACCOUNT_TYPES,
+  BILL_TYPES,
+} from "../../../core/utils/constants";
 
 export interface IUser extends Document {
   _id: mongoose.Types.ObjectId;
@@ -19,6 +23,10 @@ export interface IUser extends Document {
   defaultAccount?: mongoose.Types.ObjectId;
   accountFilters?: {
     type: AccountType;
+    enabled: boolean;
+  }[];
+  billFilters?: {
+    bill: mongoose.Types.ObjectId;
     enabled: boolean;
   }[];
   createdAt: Date;
@@ -88,6 +96,20 @@ const UserSchema = new mongoose.Schema(
         type: {
           type: String,
           enum: Object.values(ACCOUNT_TYPES),
+          required: true,
+        },
+        enabled: {
+          type: Boolean,
+          required: true,
+          default: true,
+        },
+      },
+    ],
+    billFilters: [
+      {
+        type: {
+          type: String,
+          enum: Object.values(BILL_TYPES),
           required: true,
         },
         enabled: {

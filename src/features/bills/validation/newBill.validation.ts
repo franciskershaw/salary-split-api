@@ -1,4 +1,5 @@
 import Joi from "joi";
+import { BILL_TYPES } from "../../../core/utils/constants";
 
 const newBillSchema = Joi.object({
   name: Joi.string().required().messages({
@@ -20,6 +21,13 @@ const newBillSchema = Joi.object({
     "string.empty": "Please provide an account ID.",
     "any.required": "Account ID is required.",
   }),
+  type: Joi.string()
+    .valid(...Object.values(BILL_TYPES))
+    .required()
+    .messages({
+      "string.empty": "Please provide a bill type.",
+      "any.required": "Bill type is required.",
+    }),
   splitBetween: Joi.number().integer().min(1).max(10).default(1).messages({
     "number.base": "Split between must be a number.",
     "number.integer": "Split between must be a whole number.",
