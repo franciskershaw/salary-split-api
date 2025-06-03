@@ -28,6 +28,12 @@ const expenseSchema = Joi.object({
       "string.empty": "Please provide a bill type.",
       "any.required": "Bill type is required.",
     }),
+  splitBetween: Joi.number().integer().min(1).max(10).default(1).messages({
+    "number.base": "Split between must be a number.",
+    "number.integer": "Split between must be a whole number.",
+    "number.min": "Split between must be at least 1.",
+    "number.max": "Split between cannot be more than 10.",
+  }),
 });
 
 export default expenseSchema;

@@ -7,6 +7,7 @@ export interface IExpense extends Document {
   amount: number;
   dueDate: number;
   account: mongoose.Types.ObjectId;
+  splitBetween?: number;
   order?: number;
   createdBy: mongoose.Types.ObjectId;
   createdAt: Date;
