@@ -1,4 +1,3 @@
-import mongoose from "mongoose";
 import { Request, Response, NextFunction } from "express";
 import Account from "../model/account.model";
 import { ForbiddenError } from "../../../core/utils/errors";
@@ -10,9 +9,6 @@ const reorderAccounts = async (
   res: Response,
   next: NextFunction
 ) => {
-  const session = await mongoose.startSession();
-  session.startTransaction();
-
   try {
     const accountIds = validateRequest(req.body, reorderAccountsSchema);
     const userId = req.user;
@@ -29,7 +25,7 @@ const reorderAccounts = async (
       );
     }
 
-    // Update all accounts in a single transaction
+    // Update all accounts
     const updates = accountIds.map((accountId: string, index: number) => ({
       updateOne: {
         filter: { _id: accountId },
@@ -37,8 +33,7 @@ const reorderAccounts = async (
       },
     }));
 
-    await Account.bulkWrite(updates, { session });
-    await session.commitTransaction();
+    await Account.bulkWrite(updates);
 
     const updatedAccounts = await Account.find({ createdBy: userId }).sort({
       order: 1,
@@ -46,10 +41,7 @@ const reorderAccounts = async (
 
     res.status(200).json(updatedAccounts);
   } catch (error) {
-    await session.abortTransaction();
     next(error);
-  } finally {
-    session.endSession();
   }
 };
 

@@ -10,9 +10,10 @@ const addBill = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const value = validateRequest(req.body, newBillSchema);
 
-    const [user, existingBills] = await Promise.all([
+    const [user, existingBills, billCount] = await Promise.all([
       User.findById(req.user),
       Bill.find({ createdBy: req.user, name: value.name }).countDocuments(),
+      Bill.countDocuments({ createdBy: req.user }),
     ]);
 
     if (!user) {
@@ -34,6 +35,7 @@ const addBill = async (req: Request, res: Response, next: NextFunction) => {
 
     const bill = new Bill({
       ...value,
+      order: billCount,
       createdBy: user._id,
     });
 

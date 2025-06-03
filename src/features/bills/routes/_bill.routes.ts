@@ -7,5 +7,10 @@ const router = express.Router();
 
 router.get("/", authenticateToken, asyncHandler(billController.getBills));
 router.post("/", authenticateToken, asyncHandler(billController.addBill));
+router.put(
+  "/reorder",
+  authenticateToken,
+  asyncHandler(billController.reorderBills)
+);
 
 export default router;
