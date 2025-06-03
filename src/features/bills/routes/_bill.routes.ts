@@ -12,5 +12,10 @@ router.put(
   authenticateToken,
   asyncHandler(billController.reorderBills)
 );
+router.put(
+  "/:billId",
+  authenticateToken,
+  asyncHandler(billController.editBill)
+);
 
 export default router;
