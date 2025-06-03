@@ -17,5 +17,10 @@ router.put(
   authenticateToken,
   asyncHandler(billController.editBill)
 );
+router.delete(
+  "/:billId",
+  authenticateToken,
+  asyncHandler(billController.deleteBill)
+);
 
 export default router;

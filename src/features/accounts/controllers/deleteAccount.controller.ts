@@ -23,16 +23,12 @@ const deleteAccount = async (
 
     const { accountId } = req.params;
     const account = await Account.findById(accountId);
-    if (!account) {
+    if (!account || account.createdBy.toString() !== user._id.toString()) {
       throw new NotFoundError("Account not found");
     }
 
     if (user.defaultAccount?.toString() === accountId) {
       throw new BadRequestError("You cannot remove the default account");
-    }
-
-    if (account.createdBy.toString() !== user._id.toString()) {
-      throw new ForbiddenError("You are not authorized to delete this account");
     }
 
     const bills = await Bill.find({ account: accountId });
