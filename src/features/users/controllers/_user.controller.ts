@@ -1,5 +1,5 @@
 import getUser from "./getUser.controller";
 import updateSalary from "./updateSalary.controller";
-import updateAccountFilters from "./updateAccountFilters.controller";
+import updateFilters from "./updateFilters.controller";
 
-export { getUser, updateSalary, updateAccountFilters };
+export { getUser, updateSalary, updateFilters };

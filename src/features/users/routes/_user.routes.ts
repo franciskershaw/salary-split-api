@@ -16,7 +16,13 @@ router.patch(
 router.put(
   "/account-filters",
   authenticateToken,
-  asyncHandler(userController.updateAccountFilters)
+  asyncHandler(userController.updateFilters)
+);
+
+router.put(
+  "/bill-filters",
+  authenticateToken,
+  asyncHandler(userController.updateFilters)
 );
 
 export default router;
