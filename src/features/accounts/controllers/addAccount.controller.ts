@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import Account from "../model/account.model";
 import User from "../../users/model/user.model";
 import validateRequest from "../../../core/utils/validate";
-import newAccountSchema from "../validation/newAccount.validation";
+import accountSchema from "../validation/account.validation";
 import {
   ConflictError,
   NotFoundError,
@@ -12,7 +12,7 @@ import mongoose from "mongoose";
 
 const addAccount = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const value = validateRequest(req.body, newAccountSchema);
+    const value = validateRequest(req.body, accountSchema);
 
     const session = await mongoose.startSession();
     session.startTransaction();

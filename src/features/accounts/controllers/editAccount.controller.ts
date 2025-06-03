@@ -6,13 +6,16 @@ import {
   ForbiddenError,
   NotFoundError,
 } from "../../../core/utils/errors";
-import editAccountSchema from "../validation/editAccount.validation";
+import accountSchema from "../validation/account.validation";
 import User from "../../users/model/user.model";
 import mongoose from "mongoose";
 
 const editAccount = async (req: Request, res: Response, next: NextFunction) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
   try {
-    const value = validateRequest(req.body, editAccountSchema);
+    const value = validateRequest(req.body, accountSchema);
     const { accountId } = req.params;
     const { isDefault, acceptsFunds } = value;
 
@@ -41,36 +44,27 @@ const editAccount = async (req: Request, res: Response, next: NextFunction) => {
       throw new BadRequestError("Your default account must accept funds");
     }
 
-    if (isDefault === true) {
-      const session = await mongoose.startSession();
-      session.startTransaction();
-
-      try {
-        const [updatedUser, updatedAccount] = await Promise.all([
-          User.findByIdAndUpdate(
+    const [updatedUser, updatedAccount] = await Promise.all([
+      isDefault
+        ? User.findByIdAndUpdate(
             user._id,
             { defaultAccount: accountId },
             { session, new: true }
-          ),
-          Account.findByIdAndUpdate(accountId, value, { session, new: true }),
-        ]);
+          )
+        : Promise.resolve(null),
+      Account.findByIdAndUpdate(accountId, value, { session, new: true }),
+    ]);
 
-        await session.commitTransaction();
-        session.endSession();
+    await session.commitTransaction();
+    session.endSession();
 
-        res.status(200).json({ updatedAccount, updatedUser });
-      } catch (err) {
-        await session.abortTransaction();
-        session.endSession();
-        throw err;
-      }
-    } else {
-      const updatedAccount = await Account.findByIdAndUpdate(accountId, value, {
-        new: true,
-      });
-      res.status(200).json(updatedAccount);
-    }
+    res.status(200).json({
+      updatedAccount,
+      ...(updatedUser && { updatedUser }),
+    });
   } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
     next(error);
   }
 };

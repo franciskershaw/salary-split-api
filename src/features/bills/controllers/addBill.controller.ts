@@ -3,12 +3,12 @@ import Account from "../../accounts/model/account.model";
 import Bill from "../model/bill.model";
 import User from "../../users/model/user.model";
 import validateRequest from "../../../core/utils/validate";
-import newBillSchema from "../validation/newBill.validation";
+import billSchema from "../validation/bill.validation";
 import { ConflictError, NotFoundError } from "../../../core/utils/errors";
 
 const addBill = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const value = validateRequest(req.body, newBillSchema);
+    const value = validateRequest(req.body, billSchema);
 
     const [user, existingBills, billCount] = await Promise.all([
       User.findById(req.user),

@@ -1,6 +1,6 @@
 import Joi from "joi";
 
-const editAccountSchema = Joi.object({
+const accountSchema = Joi.object({
   name: Joi.string().required().messages({
     "string.empty": "Please provide an account name.",
     "any.required": "Account name is required.",
@@ -30,4 +30,4 @@ const editAccountSchema = Joi.object({
   }),
 });
 
-export default editAccountSchema;
+export default accountSchema;

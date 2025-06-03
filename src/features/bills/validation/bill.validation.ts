@@ -1,7 +1,7 @@
 import Joi from "joi";
 import { BILL_TYPES } from "../../../core/utils/constants";
 
-const newBillSchema = Joi.object({
+const billSchema = Joi.object({
   name: Joi.string().required().messages({
     "string.empty": "Please provide a bill name.",
     "any.required": "Bill name is required.",
@@ -36,4 +36,4 @@ const newBillSchema = Joi.object({
   }),
 });
 
-export default newBillSchema;
+export default billSchema;
