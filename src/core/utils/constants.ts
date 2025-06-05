@@ -34,6 +34,8 @@ export const BILL_TYPES = {
   EDUCATION: "education",
   FOOD: "food",
   PERSONAL: "personal",
+  GIFT: "gift",
+  HOLIDAYs: "holidays",
   OTHER: "other",
 } as const;
 export type BillType = (typeof BILL_TYPES)[keyof typeof BILL_TYPES];
