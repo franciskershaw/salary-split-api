@@ -13,12 +13,12 @@ router.put(
   asyncHandler(expenseController.reorderExpenses)
 );
 router.put(
-  "/:billId",
+  "/:expenseId",
   authenticateToken,
   asyncHandler(expenseController.editExpense)
 );
 router.delete(
-  "/:billId",
+  "/:expenseId",
   authenticateToken,
   asyncHandler(expenseController.deleteExpense)
 );

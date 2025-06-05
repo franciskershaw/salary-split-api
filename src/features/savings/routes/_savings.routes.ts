@@ -13,12 +13,12 @@ router.put(
   asyncHandler(savingsController.reorderSavings)
 );
 router.put(
-  "/:billId",
+  "/:savingsId",
   authenticateToken,
   asyncHandler(savingsController.editSavings)
 );
 router.delete(
-  "/:billId",
+  "/:savingsId",
   authenticateToken,
   asyncHandler(savingsController.deleteSavings)
 );
