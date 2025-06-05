@@ -11,18 +11,18 @@ import User from "../../users/model/user.model";
 import mongoose from "mongoose";
 
 const editAccount = async (req: Request, res: Response, next: NextFunction) => {
-  const session = await mongoose.startSession();
-  session.startTransaction();
-
+  let session;
   try {
+    session = await mongoose.startSession();
+    await session.startTransaction();
+
     const value = validateRequest(req.body, accountSchema);
     const { accountId } = req.params;
     const { isDefault, acceptsFunds } = value;
 
-    const [user, account] = await Promise.all([
-      User.findById(req.user),
-      Account.findById(accountId),
-    ]);
+    // Use withTransaction to ensure proper session handling
+    const user = await User.findById(req.user).session(session);
+    const account = await Account.findById(accountId).session(session);
 
     if (!user) {
       throw new NotFoundError("User not found");
@@ -44,28 +44,35 @@ const editAccount = async (req: Request, res: Response, next: NextFunction) => {
       throw new BadRequestError("Your default account must accept funds");
     }
 
-    const [updatedUser, updatedAccount] = await Promise.all([
-      isDefault
-        ? User.findByIdAndUpdate(
-            user._id,
-            { defaultAccount: accountId },
-            { session, new: true }
-          )
-        : Promise.resolve(null),
-      Account.findByIdAndUpdate(accountId, value, { session, new: true }),
-    ]);
+    let updatedUser = null;
+    if (isDefault) {
+      updatedUser = await User.findByIdAndUpdate(
+        user._id,
+        { defaultAccount: accountId },
+        { session, new: true }
+      );
+    }
+
+    const updatedAccount = await Account.findByIdAndUpdate(accountId, value, {
+      session,
+      new: true,
+    });
 
     await session.commitTransaction();
-    session.endSession();
 
     res.status(200).json({
       updatedAccount,
       ...(updatedUser && { updatedUser }),
     });
   } catch (error) {
-    await session.abortTransaction();
-    session.endSession();
+    if (session) {
+      await session.abortTransaction();
+    }
     next(error);
+  } finally {
+    if (session) {
+      session.endSession();
+    }
   }
 };
 
