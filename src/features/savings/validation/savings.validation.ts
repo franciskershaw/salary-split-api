@@ -21,13 +21,7 @@ const savingsSchema = Joi.object({
     "string.empty": "Please provide an account ID.",
     "any.required": "Account ID is required.",
   }),
-  type: Joi.string()
-    .valid(...Object.values(BILL_TYPES))
-    .required()
-    .messages({
-      "string.empty": "Please provide a bill type.",
-      "any.required": "Bill type is required.",
-    }),
+  type: Joi.string().valid(...Object.values(BILL_TYPES)),
   splitBetween: Joi.number().integer().min(1).max(10).default(1).messages({
     "number.base": "Split between must be a number.",
     "number.integer": "Split between must be a whole number.",
