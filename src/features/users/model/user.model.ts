@@ -119,6 +119,34 @@ const UserSchema = new mongoose.Schema(
         },
       },
     ],
+    expenseFilters: [
+      {
+        type: {
+          type: String,
+          enum: Object.values(BILL_TYPES),
+          required: true,
+        },
+        enabled: {
+          type: Boolean,
+          required: true,
+          default: true,
+        },
+      },
+    ],
+    savingsFilters: [
+      {
+        type: {
+          type: String,
+          enum: Object.values(BILL_TYPES),
+          required: true,
+        },
+        enabled: {
+          type: Boolean,
+          required: true,
+          default: true,
+        },
+      },
+    ],
   },
   { timestamps: true }
 );

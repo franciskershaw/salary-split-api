@@ -25,4 +25,16 @@ router.put(
   asyncHandler(userController.updateFilters)
 );
 
+router.put(
+  "/expense-filters",
+  authenticateToken,
+  asyncHandler(userController.updateFilters)
+);
+
+router.put(
+  "/savings-filters",
+  authenticateToken,
+  asyncHandler(userController.updateFilters)
+);
+
 export default router;
