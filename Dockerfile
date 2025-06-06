@@ -1,5 +1,4 @@
 # Build stage - Compiles TypeScript to JavaScript
-# <PORT> is the port number of the website, eg 5400
 FROM node:22.5.1-alpine AS builder
 
 # Set working directory for build stage

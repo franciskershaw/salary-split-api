@@ -1,58 +1,97 @@
 import express from "express";
 import dotenv from "dotenv";
 dotenv.config();
-import connectDb from "./config/db";
-import "colors";
-import { errorHandler } from "./middleware/errorMiddleware";
+import morgan from "morgan";
 import cookieParser from "cookie-parser";
+import helmet from "helmet";
 import cors from "cors";
-import userRoutes from "./routes/userRoutes";
-import accountRoutes from "./routes/accountRoutes";
-import transactionRoutes from "./routes/transactionRoutes";
+import "colors";
+import passport from "./core/config/passport";
+import authRoutes from "./features/auth/routes/_auth.routes";
+import userRoutes from "./features/users/routes/_user.routes";
+import accountRoutes from "./features/accounts/routes/_account.routes";
+import billRoutes from "./features/bills/routes/_bill.routes";
+import expenseRoutes from "./features/expenses/routes/_expense.routes";
+import savingsRoutes from "./features/savings/routes/_savings.routes";
+import connectDb from "./core/config/database";
+import { errorHandler } from "./core/middleware/error.middleware";
 
-// Grab port info from config
+const isNetworkDevelopmentMode =
+  process.env.NODE_ENV === "development" && process.argv.includes("--host");
+
+// Declare port to run server on
 const PORT = process.env.PORT || 5300;
 
-// Initialize app
+// Initialise app
 const app = express();
 
-// Body parser
+// Logger
+if (process.env.NODE_ENV === "development") {
+  app.use(morgan("dev"));
+} else {
+  app.use(morgan("combined"));
+}
+
+// Parser
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
-// Cookie parser
+// Cookies
 app.use(cookieParser());
+
+// Basic security
+app.use(helmet());
 
 // Cors
 app.use(
   cors({
-    origin: process.env.CORS_ORIGIN,
+    origin: isNetworkDevelopmentMode
+      ? process.env.CORS_ORIGIN_NETWORK
+      : process.env.CORS_ORIGIN,
     credentials: true,
   })
 );
 
+// // Passport / Auth
+app.use(passport.initialize());
+
 // Routes
 app.use("/api/users", userRoutes);
+app.use("/api/auth", authRoutes);
 app.use("/api/accounts", accountRoutes);
-app.use("/api/transactions", transactionRoutes);
+app.use("/api/bills", billRoutes);
+app.use("/api/expenses", expenseRoutes);
+app.use("/api/savings", savingsRoutes);
+
+app.get("/", (_, res) => {
+  res.status(200).json({ message: "Welcome to the Salary Split API" });
+});
 
 // Error handler
 app.use(errorHandler);
 
-app.get("/", (req, res) => {
-  res.status(200).json({ message: "Welcome to the Salary Split API" });
-});
-
-// Connect to DB, then if successful listen for app
+// Connect to DB and start the server
 connectDb()
   .then(() => {
-    app.listen(PORT, () => {
-      console.log(
-        `Server running in ${process.env.NODE_ENV} mode on port ${PORT}\n`
-          .yellow,
-        "-----------------------------------------------------------".yellow
-      );
-    });
+    // For network development mode only, bind to all interfaces
+    if (isNetworkDevelopmentMode) {
+      app.listen(parseInt(PORT as string, 10), "0.0.0.0", () => {
+        console.log(
+          `Server running in ${process.env.NODE_ENV} mode on network (0.0.0.0:${PORT})\n`
+            .yellow,
+          "-----------------------------------------------------------".yellow
+        );
+      });
+    } else {
+      // Normal mode
+      app.listen(PORT, () => {
+        console.log(
+          `Server running in ${process.env.NODE_ENV} mode on port ${PORT}\n`
+            .yellow,
+          "-----------------------------------------------------------".yellow
+        );
+      });
+    }
   })
   .catch((err) => {
     console.error(
