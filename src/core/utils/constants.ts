@@ -39,3 +39,10 @@ export const BILL_TYPES = {
   OTHER: "other",
 } as const;
 export type BillType = (typeof BILL_TYPES)[keyof typeof BILL_TYPES];
+
+export const CURRENCIES = {
+  GBP: "GBP",
+  USD: "USD",
+  EUR: "EUR",
+} as const;
+export type Currency = (typeof CURRENCIES)[keyof typeof CURRENCIES];

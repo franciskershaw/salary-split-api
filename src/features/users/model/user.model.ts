@@ -3,6 +3,8 @@ import {
   AccountType,
   ACCOUNT_TYPES,
   BILL_TYPES,
+  Currency,
+  CURRENCIES,
 } from "../../../core/utils/constants";
 
 export interface IUser extends Document {
@@ -18,7 +20,7 @@ export interface IUser extends Document {
   googleId?: string;
   takeHomePay: number;
   payDay: string;
-  defaultCurrency: "GBP" | "USD" | "EUR";
+  defaultCurrency: Currency;
   defaultTheme: "light" | "dark";
   defaultAccount?: mongoose.Types.ObjectId;
   accountFilters?: {
@@ -83,7 +85,7 @@ const UserSchema = new mongoose.Schema(
     },
     defaultCurrency: {
       type: String,
-      enum: ["GBP", "USD", "EUR"],
+      enum: Object.values(CURRENCIES),
       default: "GBP",
     },
     defaultTheme: {
