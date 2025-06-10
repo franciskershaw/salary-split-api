@@ -7,6 +7,8 @@ const router = express.Router();
 
 router.get("/", authenticateToken, asyncHandler(userController.getUser));
 
+router.put("/", authenticateToken, asyncHandler(userController.updateUser));
+
 router.patch(
   "/salary",
   authenticateToken,
