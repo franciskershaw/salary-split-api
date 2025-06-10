@@ -39,4 +39,10 @@ router.put(
   asyncHandler(userController.updateFilters)
 );
 
+router.put(
+  "/theme",
+  authenticateToken,
+  asyncHandler(userController.updateTheme)
+);
+
 export default router;
