@@ -44,14 +44,14 @@ const addAccount = async (req: Request, res: Response, next: NextFunction) => {
     });
 
     // If it's the first account, use a transaction to update both documents
-    if (isFirstAccount) {
+    if (isFirstAccount || value.isDefault) {
       try {
         await Promise.all([
           account.save({ session }),
           User.findByIdAndUpdate(
             user._id,
             { defaultAccount: account._id },
-            { session }
+            { session, new: true }
           ),
         ]);
         await session.commitTransaction();
