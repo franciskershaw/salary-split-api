@@ -11,20 +11,23 @@ import {
 import mongoose from "mongoose";
 
 const addAccount = async (req: Request, res: Response, next: NextFunction) => {
+  let session;
   try {
     const value = validateRequest(req.body, accountSchema);
 
-    const session = await mongoose.startSession();
+    session = await mongoose.startSession();
     session.startTransaction();
 
-    const [user, existingAccounts] = await Promise.all([
-      User.findById(req.user),
-      Account.find({ createdBy: req.user, name: value.name }).countDocuments(),
-    ]);
-
+    const user = await User.findById(req.user).session(session).exec();
+    
     if (!user) {
       throw new NotFoundError("User not found");
     }
+
+    const existingAccounts = await Account.find({ 
+      createdBy: req.user, 
+      name: value.name 
+    }).countDocuments().session(session).exec();
 
     if (existingAccounts > 0) {
       throw new ConflictError("You've used that name already");
@@ -36,38 +39,40 @@ const addAccount = async (req: Request, res: Response, next: NextFunction) => {
       throw new BadRequestError("Your default account must accept funds");
     }
 
-    const accountCount = await Account.countDocuments({ createdBy: user._id });
+    const accountCount = await Account.countDocuments({
+      createdBy: user._id,
+    }).session(session).exec();
+    
     const account = new Account({
       ...value,
       order: accountCount,
       createdBy: user._id,
     });
 
-    // If it's the first account, use a transaction to update both documents
+    // Save account first
+    await account.save({ session });
+
+    // Update user's default account if needed
     if (isFirstAccount || value.isDefault) {
-      try {
-        await Promise.all([
-          account.save({ session }),
-          User.findByIdAndUpdate(
-            user._id,
-            { defaultAccount: account._id },
-            { session, new: true }
-          ),
-        ]);
-        await session.commitTransaction();
-      } catch (err) {
-        await session.abortTransaction();
-        throw err;
-      } finally {
-        session.endSession();
-      }
-    } else {
-      await account.save();
+      await User.findByIdAndUpdate(
+        user._id,
+        { defaultAccount: account._id },
+        { session, new: true }
+      );
     }
 
+    await session.commitTransaction();
+
     res.status(201).json(account);
-  } catch (err) {
-    next(err);
+  } catch (error) {
+    if (session) {
+      await session.abortTransaction();
+    }
+    next(error);
+  } finally {
+    if (session) {
+      session.endSession();
+    }
   }
 };
 

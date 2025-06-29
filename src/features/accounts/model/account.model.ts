@@ -18,7 +18,6 @@ const AccountSchema = new mongoose.Schema(
     name: {
       type: String,
       required: true,
-      unique: true,
     },
     institution: {
       type: String,
@@ -55,6 +54,9 @@ const AccountSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+// Compound unique index: name must be unique per user
+AccountSchema.index({ name: 1, createdBy: 1 }, { unique: true });
 
 const Account: Model<IAccount> = mongoose.model<IAccount>(
   "Account",

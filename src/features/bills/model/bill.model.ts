@@ -19,7 +19,6 @@ const BillSchema = new mongoose.Schema(
     name: {
       type: String,
       required: true,
-      unique: true,
     },
     amount: {
       type: Number,
@@ -64,6 +63,9 @@ const BillSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+// Compound unique index: name must be unique per user
+BillSchema.index({ name: 1, createdBy: 1 }, { unique: true });
 
 const Bill: Model<IBill> = mongoose.model<IBill>("Bill", BillSchema);
 export default Bill;

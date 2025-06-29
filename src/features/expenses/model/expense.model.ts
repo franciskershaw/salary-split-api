@@ -18,7 +18,6 @@ const ExpenseSchema = new mongoose.Schema(
     name: {
       type: String,
       required: true,
-      unique: true,
     },
     amount: {
       type: Number,
@@ -53,6 +52,9 @@ const ExpenseSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+// Compound unique index: name must be unique per user
+ExpenseSchema.index({ name: 1, createdBy: 1 }, { unique: true });
 
 const Expense: Model<IExpense> = mongoose.model<IExpense>(
   "Expense",
