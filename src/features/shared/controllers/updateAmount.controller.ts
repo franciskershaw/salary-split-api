@@ -11,6 +11,7 @@ import Account from "../../accounts/model/account.model";
 import Bill from "../../bills/model/bill.model";
 import Expense from "../../expenses/model/expense.model";
 import Savings from "../../savings/model/savings.model";
+import { IUser } from "../../users/model/user.model";
 
 // Model mapping with proper typing
 const FEATURE_MODELS = {
@@ -34,6 +35,7 @@ const updateAmount = async (
   try {
     const value = validateRequest(req.body, updateAmountSchema);
     const { feature, itemId } = req.params;
+    const user = req.user as IUser;
     const { amount } = value;
 
     // Validate feature parameter
@@ -56,7 +58,7 @@ const updateAmount = async (
       throw new NotFoundError(`${config.singular} not found`);
     }
 
-    if (item.createdBy.toString() !== req.user!.toString()) {
+    if (item.createdBy.toString() !== user._id.toString()) {
       throw new ForbiddenError(
         `You are not authorized to update this ${config.singular}`
       );
