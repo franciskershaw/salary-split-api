@@ -20,6 +20,25 @@ const editAccount = async (req: Request, res: Response, next: NextFunction) => {
     const { accountId } = req.params;
     const { isDefault, acceptsFunds } = value;
 
+    // Separate fields to update vs fields to unset
+    const updateFields: any = { ...value };
+    const unsetFields: any = {};
+
+    // Check for null values and move them to unset
+    if (value.targetMonthlyAmount === null) {
+      delete updateFields.targetMonthlyAmount;
+      unsetFields.targetMonthlyAmount = "";
+    }
+
+    // Build the update operation
+    const updateOperation: any = {};
+    if (Object.keys(updateFields).length > 0) {
+      updateOperation.$set = updateFields;
+    }
+    if (Object.keys(unsetFields).length > 0) {
+      updateOperation.$unset = unsetFields;
+    }
+
     // Use withTransaction to ensure proper session handling
     const user = await User.findById(req.user).session(session);
     const account = await Account.findById(accountId).session(session);
@@ -53,10 +72,11 @@ const editAccount = async (req: Request, res: Response, next: NextFunction) => {
       );
     }
 
-    const updatedAccount = await Account.findByIdAndUpdate(accountId, value, {
-      session,
-      new: true,
-    });
+    const updatedAccount = await Account.findByIdAndUpdate(
+      accountId, 
+      updateOperation,
+      { session, new: true }
+    );
 
     await session.commitTransaction();
 

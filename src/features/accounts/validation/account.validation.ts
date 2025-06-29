@@ -43,6 +43,7 @@ const accountSchema = Joi.object({
     }),
   })
     .optional()
+    .allow(null)
     .messages({
       "object.base":
         "Target monthly amount must be an object with amount and splitBetween fields.",
