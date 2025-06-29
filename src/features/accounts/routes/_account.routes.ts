@@ -17,11 +17,6 @@ router.put(
   authenticateToken,
   asyncHandler(accountController.editAccount)
 );
-router.patch(
-  "/:accountId/amount",
-  authenticateToken,
-  asyncHandler(accountController.updateAmount)
-);
 router.delete(
   "/:accountId",
   authenticateToken,

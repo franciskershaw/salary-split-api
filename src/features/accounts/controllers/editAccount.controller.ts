@@ -14,7 +14,7 @@ const editAccount = async (req: Request, res: Response, next: NextFunction) => {
   let session;
   try {
     session = await mongoose.startSession();
-    await session.startTransaction();
+    session.startTransaction();
 
     const value = validateRequest(req.body, accountSchema);
     const { accountId } = req.params;

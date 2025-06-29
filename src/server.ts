@@ -13,6 +13,7 @@ import accountRoutes from "./features/accounts/routes/_account.routes";
 import billRoutes from "./features/bills/routes/_bill.routes";
 import expenseRoutes from "./features/expenses/routes/_expense.routes";
 import savingsRoutes from "./features/savings/routes/_savings.routes";
+import updateAmountRoutes from "./features/shared/routes/updateAmount.routes";
 import connectDb from "./core/config/database";
 import { errorHandler } from "./core/middleware/error.middleware";
 
@@ -62,6 +63,7 @@ app.use("/api/accounts", accountRoutes);
 app.use("/api/bills", billRoutes);
 app.use("/api/expenses", expenseRoutes);
 app.use("/api/savings", savingsRoutes);
+app.use("/api/update-amount", updateAmountRoutes);
 
 app.get("/", (_, res) => {
   res.status(200).json({ message: "Welcome to the Salary Split API" });

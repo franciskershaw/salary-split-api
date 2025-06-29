@@ -46,3 +46,24 @@ export const CURRENCIES = {
   EUR: "EUR",
 } as const;
 export type Currency = (typeof CURRENCIES)[keyof typeof CURRENCIES];
+
+// Feature Models for Amount Updates
+export const FEATURE_CONFIG = {
+  accounts: {
+    singular: "account",
+    responseKey: "updatedAccount",
+  },
+  bills: {
+    singular: "bill",
+    responseKey: "updatedBill",
+  },
+  expenses: {
+    singular: "expense",
+    responseKey: "updatedExpense",
+  },
+  savings: {
+    singular: "saving",
+    responseKey: "updatedSaving",
+  },
+} as const;
+export type FeatureType = keyof typeof FEATURE_CONFIG;
