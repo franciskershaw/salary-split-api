@@ -19,15 +19,18 @@ const addAccount = async (req: Request, res: Response, next: NextFunction) => {
     session.startTransaction();
 
     const user = await User.findById(req.user).session(session).exec();
-    
+
     if (!user) {
       throw new NotFoundError("User not found");
     }
 
-    const existingAccounts = await Account.find({ 
-      createdBy: req.user, 
-      name: value.name 
-    }).countDocuments().session(session).exec();
+    const existingAccounts = await Account.find({
+      createdBy: req.user,
+      name: value.name,
+    })
+      .countDocuments()
+      .session(session)
+      .exec();
 
     if (existingAccounts > 0) {
       throw new ConflictError("You've used that name already");
@@ -41,8 +44,10 @@ const addAccount = async (req: Request, res: Response, next: NextFunction) => {
 
     const accountCount = await Account.countDocuments({
       createdBy: user._id,
-    }).session(session).exec();
-    
+    })
+      .session(session)
+      .exec();
+
     const account = new Account({
       ...value,
       order: accountCount,

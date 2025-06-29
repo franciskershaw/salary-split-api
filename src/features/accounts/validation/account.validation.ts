@@ -28,6 +28,25 @@ const accountSchema = Joi.object({
   institution: Joi.string().allow("").messages({
     "string.base": "Institution must be a string.",
   }),
+  targetMonthlyAmount: Joi.object({
+    amount: Joi.number().required().messages({
+      "number.base": "Target monthly amount must be a number.",
+      "any.required":
+        "Target monthly amount is required when setting up target monthly amount.",
+    }),
+    splitBetween: Joi.number().required().min(1).max(10).messages({
+      "number.base": "Split between must be a number.",
+      "number.min": "Split between must be at least 1 person.",
+      "number.max": "Split between cannot exceed 10 people.",
+      "any.required":
+        "Split between is required when setting up target monthly amount.",
+    }),
+  })
+    .optional()
+    .messages({
+      "object.base":
+        "Target monthly amount must be an object with amount and splitBetween fields.",
+    }),
 });
 
 export default accountSchema;

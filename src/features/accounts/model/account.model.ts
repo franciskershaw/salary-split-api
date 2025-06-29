@@ -9,6 +9,10 @@ export interface IAccount extends Document {
   acceptsFunds: boolean;
   receivesSalary?: boolean;
   type: AccountType;
+  targetMonthlyAmount?: {
+    amount: number;
+    splitBetween: number;
+  };
   createdBy: mongoose.Types.ObjectId;
   createdAt: Date;
 }
@@ -41,6 +45,21 @@ const AccountSchema = new mongoose.Schema(
       enum: Object.values(ACCOUNT_TYPES),
       required: true,
       default: ACCOUNT_TYPES.CURRENT,
+    },
+    targetMonthlyAmount: {
+      type: {
+        amount: {
+          type: Number,
+          required: true,
+        },
+        splitBetween: {
+          type: Number,
+          required: true,
+          min: 1,
+          max: 10,
+        },
+      },
+      required: false,
     },
     order: {
       type: Number,
