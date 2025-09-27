@@ -8,6 +8,7 @@ const billSchema = Joi.object({
   }),
   amount: Joi.number().required().messages({
     "number.base": "Amount must be a number.",
+    "number.min": "Amount cannot be negative.",
     "any.required": "Amount is required.",
   }),
   dueDate: Joi.number().integer().min(1).max(31).required().messages({
