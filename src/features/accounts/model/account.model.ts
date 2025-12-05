@@ -13,6 +13,7 @@ export interface IAccount extends Document {
     amount: number;
     splitBetween: number;
   };
+  trackTransactions?: boolean;
   createdBy: mongoose.Types.ObjectId;
   createdAt: Date;
 }
@@ -64,6 +65,11 @@ const AccountSchema = new mongoose.Schema(
     order: {
       type: Number,
       required: true,
+    },
+    trackTransactions: {
+      type: Boolean,
+      default: false,
+      required: false,
     },
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
