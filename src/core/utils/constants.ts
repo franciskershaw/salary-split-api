@@ -47,6 +47,15 @@ export const CURRENCIES = {
 } as const;
 export type Currency = (typeof CURRENCIES)[keyof typeof CURRENCIES];
 
+export const CATEGORY_APPLICABLE_FEATURES = [
+  "transactions",
+  "bills",
+  "expenses",
+  "savings",
+] as const;
+export type CategoryApplicableFeature =
+  (typeof CATEGORY_APPLICABLE_FEATURES)[number];
+
 // Feature Models for Amount Updates
 export const FEATURE_CONFIG = {
   accounts: {
@@ -66,4 +75,5 @@ export const FEATURE_CONFIG = {
     responseKey: "updatedSaving",
   },
 } as const;
+
 export type FeatureType = keyof typeof FEATURE_CONFIG;

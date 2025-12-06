@@ -67,9 +67,18 @@ const AccountSchema = new mongoose.Schema(
       required: true,
     },
     trackTransactions: {
-      type: Boolean,
-      default: false,
+      type: {
+        balance: {
+          type: Number,
+          required: true,
+        },
+        timestamp: {
+          type: Date,
+          required: true,
+        },
+      },
       required: false,
+      default: null,
     },
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
