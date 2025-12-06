@@ -14,6 +14,7 @@ import billRoutes from "./features/bills/routes/_bill.routes";
 import expenseRoutes from "./features/expenses/routes/_expense.routes";
 import savingsRoutes from "./features/savings/routes/_savings.routes";
 import categoryRoutes from "./features/categories/routes/_category.routes";
+import transactionRoutes from "./features/transactions/routes/_transaction.routes";
 import updateAmountRoutes from "./features/shared/routes/updateAmount.routes";
 import connectDb from "./core/config/database";
 import { errorHandler } from "./core/middleware/error.middleware";
@@ -65,6 +66,7 @@ app.use("/api/bills", billRoutes);
 app.use("/api/expenses", expenseRoutes);
 app.use("/api/savings", savingsRoutes);
 app.use("/api/categories", categoryRoutes);
+app.use("/api/transactions", transactionRoutes);
 app.use("/api/update-amount", updateAmountRoutes);
 
 app.get("/", (_, res) => {
