@@ -5,6 +5,11 @@ import * as transactionController from "../controllers/_transaction.controller";
 
 const router = express.Router();
 
+router.get(
+  "/",
+  authenticateToken,
+  asyncHandler(transactionController.getTransactions)
+);
 router.post(
   "/",
   authenticateToken,

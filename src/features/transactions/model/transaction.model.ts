@@ -108,6 +108,7 @@ const TransactionSchema = new mongoose.Schema(
 TransactionSchema.index({ account: 1, date: -1 }); // Account transaction history
 TransactionSchema.index({ account: 1, "splits.category": 1 }); // Category analysis
 TransactionSchema.index({ createdBy: 1, date: -1 }); // User-wide queries
+TransactionSchema.index({ createdBy: 1, account: 1, date: -1 }); // Most common query pattern
 TransactionSchema.index({ date: 1 }); // Date range queries
 
 // Virtual to calculate total transaction amount
