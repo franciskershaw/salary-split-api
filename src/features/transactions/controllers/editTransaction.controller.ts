@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from "express";
-import Account from "../../accounts/model/account.model";
 import Category from "../../categories/model/category.model";
 import Transaction from "../model/transaction.model";
 import User from "../../users/model/user.model";
+import Account from "../../accounts/model/account.model";
 import validateRequest from "../../../core/utils/validate";
 import transactionSchema from "../validation/transaction.validation";
 import {
@@ -17,8 +17,8 @@ const editTransaction = async (
   next: NextFunction
 ) => {
   try {
+    const { accountId, transactionId } = req.params;
     const value = validateRequest(req.body, transactionSchema);
-    const { transactionId } = req.params;
 
     const [user, existingTransaction] = await Promise.all([
       User.findById(req.user),
@@ -40,14 +40,16 @@ const editTransaction = async (
       );
     }
 
-    // Validate account exists and belongs to user
-    const account = await Account.findOne({
-      _id: value.account,
-      createdBy: user._id,
-    });
+    // Verify transaction belongs to the account in the URL
+    if (existingTransaction.account.toString() !== accountId) {
+      throw new NotFoundError("Transaction not found in this account");
+    }
 
-    if (!account) {
-      throw new NotFoundError("Account not found");
+    // Ensure account in body matches account in URL
+    if (value.account !== accountId) {
+      throw new BadRequestError(
+        "Account ID in request body must match the account in the URL"
+      );
     }
 
     // Validate all categories exist and belong to user

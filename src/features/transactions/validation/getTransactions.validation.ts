@@ -20,9 +20,6 @@ const getTransactionsQuerySchema = Joi.object({
     "string.base": "Sort order must be a string.",
     "any.only": "Sort order must be either 'asc' or 'desc'.",
   }),
-  accountId: Joi.string().optional().messages({
-    "string.base": "Account ID must be a string.",
-  }),
   categories: Joi.string().optional().messages({
     "string.base": "Categories must be a comma-separated string.",
   }),

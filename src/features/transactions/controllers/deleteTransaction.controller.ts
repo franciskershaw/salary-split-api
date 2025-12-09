@@ -10,19 +10,25 @@ const deleteTransaction = async (
 ) => {
   try {
     const userId = req.user;
+    const { accountId, transactionId } = req.params;
+
     const user = await User.findById(userId);
 
     if (!user) {
       throw new NotFoundError("User not found");
     }
 
-    const { transactionId } = req.params;
     const transaction = await Transaction.findById(transactionId);
     if (
       !transaction ||
       transaction.createdBy.toString() !== user._id.toString()
     ) {
       throw new NotFoundError("Transaction not found");
+    }
+
+    // Verify transaction belongs to the account in the URL
+    if (transaction.account.toString() !== accountId) {
+      throw new NotFoundError("Transaction not found in this account");
     }
 
     await Transaction.findByIdAndDelete(transactionId);

@@ -1,10 +1,9 @@
 import { Request, Response, NextFunction } from "express";
 import Transaction from "../model/transaction.model";
-import Account from "../../accounts/model/account.model";
 import { IUser } from "../../users/model/user.model";
 import validateRequest from "../../../core/utils/validate";
 import getTransactionsQuerySchema from "../validation/getTransactions.validation";
-import { BadRequestError, NotFoundError } from "../../../core/utils/errors";
+import { IAccount } from "../../accounts/model/account.model";
 
 const getTransactions = async (
   req: Request,
@@ -13,6 +12,8 @@ const getTransactions = async (
 ) => {
   try {
     const user = req.user as IUser;
+    const { accountId } = req.params;
+    const account = req.account as IAccount;
     const queryParams = validateRequest(req.query, getTransactionsQuerySchema);
 
     const {
@@ -20,7 +21,6 @@ const getTransactions = async (
       limit,
       sortBy,
       sortOrder,
-      accountId,
       categories,
       type,
       startDate,
@@ -29,23 +29,11 @@ const getTransactions = async (
       maxAmount,
     } = queryParams;
 
-    // Build base query
-    const query: any = { createdBy: user._id };
-
-    // Filter by account
-    if (accountId) {
-      // Verify account belongs to user
-      const account = await Account.findOne({
-        _id: accountId,
-        createdBy: user._id,
-      });
-
-      if (!account) {
-        throw new NotFoundError("Account not found");
-      }
-
-      query.account = accountId;
-    }
+    // Build base query (always filtered by accountId from path)
+    const query: any = {
+      createdBy: user._id,
+      account: accountId,
+    };
 
     // Filter by type
     if (type) {
@@ -110,7 +98,6 @@ const getTransactions = async (
 
     // Build filters object for response
     const appliedFilters: any = {};
-    if (accountId) appliedFilters.accountId = accountId;
     if (categories) appliedFilters.categories = categories.split(",");
     if (type) appliedFilters.type = type;
     if (startDate) appliedFilters.startDate = startDate;
@@ -119,6 +106,7 @@ const getTransactions = async (
     if (maxAmount !== undefined) appliedFilters.maxAmount = maxAmount;
 
     res.status(200).json({
+      account,
       transactions: filteredTransactions,
       pagination: {
         page,
