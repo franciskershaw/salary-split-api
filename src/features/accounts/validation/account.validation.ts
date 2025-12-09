@@ -48,6 +48,25 @@ const accountSchema = Joi.object({
       "object.base":
         "Target monthly amount must be an object with amount and splitBetween fields.",
     }),
+  trackTransactions: Joi.object({
+    balance: Joi.number().required().messages({
+      "number.base": "Starting balance must be a number.",
+      "any.required":
+        "Starting balance is required when enabling transaction tracking.",
+    }),
+    timestamp: Joi.date().required().max("now").messages({
+      "date.base": "Timestamp must be a valid date.",
+      "date.max": "Timestamp cannot be in the future.",
+      "any.required":
+        "Timestamp is required when enabling transaction tracking.",
+    }),
+  })
+    .optional()
+    .allow(null)
+    .messages({
+      "object.base":
+        "Track transactions must be an object with balance and timestamp fields.",
+    }),
 });
 
 export default accountSchema;
