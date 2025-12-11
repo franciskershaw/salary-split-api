@@ -19,7 +19,8 @@ const editTransaction = async (
 ) => {
   let session;
   try {
-    const { accountId, transactionId } = req.params;
+    const account = req.account!;
+    const { transactionId } = req.params;
     const value = validateRequest(req.body, transactionSchema);
 
     // Start MongoDB transaction for atomic balance update
@@ -47,15 +48,8 @@ const editTransaction = async (
     }
 
     // Verify transaction belongs to the account in the URL
-    if (existingTransaction.account.toString() !== accountId) {
+    if (existingTransaction.account.toString() !== account._id.toString()) {
       throw new NotFoundError("Transaction not found in this account");
-    }
-
-    // Ensure account in body matches account in URL
-    if (value.account !== accountId) {
-      throw new BadRequestError(
-        "Account ID in request body must match the account in the URL"
-      );
     }
 
     // Calculate old and new transaction amounts
@@ -100,21 +94,21 @@ const editTransaction = async (
       }
 
       // Prevent transfer to the same account
-      if (value.account === value.transferToAccount) {
+      if (account._id.toString() === value.transferToAccount) {
         throw new BadRequestError("Cannot transfer to the same account");
       }
     }
 
     const transaction = await Transaction.findByIdAndUpdate(
       transactionId,
-      value,
+      { ...value, account: account._id },
       { new: true, session }
     );
 
     // Update account balance with the difference
     if (balanceDifference !== 0) {
       await Account.findByIdAndUpdate(
-        accountId,
+        account._id,
         {
           $inc: { amount: balanceDifference },
         },

@@ -16,10 +16,6 @@ const transactionSplitSchema = Joi.object({
 });
 
 const transactionSchema = Joi.object({
-  account: Joi.string().required().messages({
-    "string.empty": "Please provide an account ID.",
-    "any.required": "Account ID is required.",
-  }),
   type: Joi.string()
     .valid("income", "expense", "transfer")
     .required()

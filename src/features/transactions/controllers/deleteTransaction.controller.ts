@@ -13,7 +13,8 @@ const deleteTransaction = async (
   let session;
   try {
     const userId = req.user;
-    const { accountId, transactionId } = req.params;
+    const account = req.account!;
+    const { transactionId } = req.params;
 
     // Start MongoDB transaction for atomic balance update
     session = await mongoose.startSession();
@@ -36,7 +37,7 @@ const deleteTransaction = async (
     }
 
     // Verify transaction belongs to the account in the URL
-    if (transaction.account.toString() !== accountId) {
+    if (transaction.account.toString() !== account._id.toString()) {
       throw new NotFoundError("Transaction not found in this account");
     }
 
@@ -50,7 +51,7 @@ const deleteTransaction = async (
 
     // Update account balance by subtracting the transaction amount
     await Account.findByIdAndUpdate(
-      accountId,
+      account._id,
       {
         $inc: { amount: -totalAmount },
       },

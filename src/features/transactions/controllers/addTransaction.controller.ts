@@ -15,20 +15,13 @@ const addTransaction = async (
 ) => {
   let session;
   try {
-    const { accountId } = req.params;
+    const account = req.account!;
     const value = validateRequest(req.body, transactionSchema);
 
     const user = await User.findById(req.user);
 
     if (!user) {
       throw new NotFoundError("User not found");
-    }
-
-    // Ensure account in body matches account in URL
-    if (value.account !== accountId) {
-      throw new BadRequestError(
-        "Account ID in request body must match the account in the URL"
-      );
     }
 
     // Start MongoDB transaction for atomic balance update
@@ -66,13 +59,14 @@ const addTransaction = async (
       }
 
       // Prevent transfer to the same account
-      if (value.account === value.transferToAccount) {
+      if (account._id.toString() === value.transferToAccount) {
         throw new BadRequestError("Cannot transfer to the same account");
       }
     }
 
     const transaction = new Transaction({
       ...value,
+      account,
       createdBy: user._id,
     });
 
@@ -86,7 +80,7 @@ const addTransaction = async (
 
     // Update account balance atomically
     await Account.findByIdAndUpdate(
-      accountId,
+      account._id,
       {
         $inc: { amount: totalAmount },
       },
