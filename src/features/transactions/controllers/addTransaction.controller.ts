@@ -6,12 +6,14 @@ import Account from "../../accounts/model/account.model";
 import validateRequest from "../../../core/utils/validate";
 import transactionSchema from "../validation/transaction.validation";
 import { BadRequestError, NotFoundError } from "../../../core/utils/errors";
+import mongoose from "mongoose";
 
 const addTransaction = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
+  let session;
   try {
     const { accountId } = req.params;
     const value = validateRequest(req.body, transactionSchema);
@@ -28,6 +30,10 @@ const addTransaction = async (
         "Account ID in request body must match the account in the URL"
       );
     }
+
+    // Start MongoDB transaction for atomic balance update
+    session = await mongoose.startSession();
+    session.startTransaction();
 
     // Validate all categories exist and belong to user
     const categoryIds = value.splits.map((split: any) => split.category);
@@ -70,11 +76,35 @@ const addTransaction = async (
       createdBy: user._id,
     });
 
-    await transaction.save();
+    await transaction.save({ session });
+
+    // Calculate total transaction amount
+    const totalAmount = value.splits.reduce(
+      (sum: number, split: any) => sum + split.amount,
+      0
+    );
+
+    // Update account balance atomically
+    await Account.findByIdAndUpdate(
+      accountId,
+      {
+        $inc: { amount: totalAmount },
+      },
+      { session }
+    );
+
+    await session.commitTransaction();
 
     res.status(201).json(transaction);
   } catch (error) {
+    if (session) {
+      await session.abortTransaction();
+    }
     next(error);
+  } finally {
+    if (session) {
+      session.endSession();
+    }
   }
 };
 

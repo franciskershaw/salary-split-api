@@ -13,7 +13,10 @@ export interface IAccount extends Document {
     amount: number;
     splitBetween: number;
   };
-  trackTransactions?: boolean;
+  trackTransactions?: {
+    balance: number;
+    timestamp: Date;
+  } | null;
   createdBy: mongoose.Types.ObjectId;
   createdAt: Date;
 }

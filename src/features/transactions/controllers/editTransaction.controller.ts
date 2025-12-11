@@ -10,19 +10,25 @@ import {
   ForbiddenError,
   NotFoundError,
 } from "../../../core/utils/errors";
+import mongoose from "mongoose";
 
 const editTransaction = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
+  let session;
   try {
     const { accountId, transactionId } = req.params;
     const value = validateRequest(req.body, transactionSchema);
 
+    // Start MongoDB transaction for atomic balance update
+    session = await mongoose.startSession();
+    session.startTransaction();
+
     const [user, existingTransaction] = await Promise.all([
-      User.findById(req.user),
-      Transaction.findById(transactionId),
+      User.findById(req.user).session(session),
+      Transaction.findById(transactionId).session(session),
     ]);
 
     if (!user) {
@@ -52,12 +58,23 @@ const editTransaction = async (
       );
     }
 
+    // Calculate old and new transaction amounts
+    const oldAmount = existingTransaction.splits.reduce(
+      (sum, split) => sum + split.amount,
+      0
+    );
+    const newAmount = value.splits.reduce(
+      (sum: number, split: any) => sum + split.amount,
+      0
+    );
+    const balanceDifference = newAmount - oldAmount;
+
     // Validate all categories exist and belong to user
     const categoryIds = value.splits.map((split: any) => split.category);
     const categories = await Category.find({
       _id: { $in: categoryIds },
       createdBy: user._id,
-    });
+    }).session(session);
 
     if (categories.length !== categoryIds.length) {
       throw new NotFoundError(
@@ -76,7 +93,7 @@ const editTransaction = async (
       const transferAccount = await Account.findOne({
         _id: value.transferToAccount,
         createdBy: user._id,
-      });
+      }).session(session);
 
       if (!transferAccount) {
         throw new NotFoundError("Transfer destination account not found");
@@ -91,12 +108,32 @@ const editTransaction = async (
     const transaction = await Transaction.findByIdAndUpdate(
       transactionId,
       value,
-      { new: true }
+      { new: true, session }
     );
+
+    // Update account balance with the difference
+    if (balanceDifference !== 0) {
+      await Account.findByIdAndUpdate(
+        accountId,
+        {
+          $inc: { amount: balanceDifference },
+        },
+        { session }
+      );
+    }
+
+    await session.commitTransaction();
 
     res.status(200).json(transaction);
   } catch (error) {
+    if (session) {
+      await session.abortTransaction();
+    }
     next(error);
+  } finally {
+    if (session) {
+      session.endSession();
+    }
   }
 };
 

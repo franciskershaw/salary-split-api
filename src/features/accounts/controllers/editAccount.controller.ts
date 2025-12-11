@@ -55,6 +55,13 @@ const editAccount = async (req: Request, res: Response, next: NextFunction) => {
       throw new ForbiddenError("You are not authorized to edit this account");
     }
 
+    // Block manual amount changes when transaction tracking is enabled
+    if (account.trackTransactions && value.amount !== account.amount) {
+      throw new BadRequestError(
+        "Cannot manually update amount when transaction tracking is enabled. Balance is automatically calculated from transactions."
+      );
+    }
+
     if (isDefault === false && user.defaultAccount?.toString() === accountId) {
       throw new BadRequestError("You cannot remove the default account");
     }

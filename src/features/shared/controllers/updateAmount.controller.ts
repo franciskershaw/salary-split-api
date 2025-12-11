@@ -64,6 +64,13 @@ const updateAmount = async (
       );
     }
 
+    // Block amount updates for accounts with transaction tracking enabled
+    if (featureType === "accounts" && item.trackTransactions) {
+      throw new BadRequestError(
+        "Cannot manually update amount when transaction tracking is enabled. Balance is automatically calculated from transactions."
+      );
+    }
+
     // Update the item
     const updatedItem = await Model.findByIdAndUpdate(
       itemId,

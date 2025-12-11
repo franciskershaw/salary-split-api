@@ -111,11 +111,6 @@ TransactionSchema.index({ createdBy: 1, date: -1 }); // User-wide queries
 TransactionSchema.index({ createdBy: 1, account: 1, date: -1 }); // Most common query pattern
 TransactionSchema.index({ date: 1 }); // Date range queries
 
-// Virtual to calculate total transaction amount
-TransactionSchema.virtual("totalAmount").get(function (this: ITransaction) {
-  return this.splits.reduce((sum, split) => sum + split.amount, 0);
-});
-
 const Transaction: Model<ITransaction> = mongoose.model<ITransaction>(
   "Transaction",
   TransactionSchema
