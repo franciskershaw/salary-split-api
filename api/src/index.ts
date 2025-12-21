@@ -6,6 +6,7 @@ import dotenv from "dotenv";
 dotenv.config();
 import connectDb from "./core/config/databse";
 import { securityHeaders } from "./core/middleware/security.middleware";
+import { errorHandler } from "./core/middleware/error.middleware";
 
 const isNetworkDevelopmentMode =
   process.env.NODE_ENV === "development" && process.argv.includes("--host");
@@ -13,10 +14,13 @@ const isNetworkDevelopmentMode =
 const PORT = Number(process.env.PORT) || 3000;
 const app = new Hono();
 
+// Logger middleware
 app.use(logger());
 
+// Security headers middleware
 app.use(securityHeaders);
 
+// CORS middleware
 app.use(
   cors({
     origin: isNetworkDevelopmentMode
@@ -26,6 +30,7 @@ app.use(
   })
 );
 
+// Welcome route
 app.get("/", (c) => {
   return c.json(
     { messge: "Welcome to the Salary Split API (Hono Edition)" },
@@ -33,7 +38,10 @@ app.get("/", (c) => {
   );
 });
 
-// Start everything
+// Error handling middleware
+app.onError(errorHandler);
+
+// Start the app
 connectDb()
   .then((db) => {
     console.log(
