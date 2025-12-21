@@ -1,54 +1,24 @@
+import "dotenv/config";
 import { serve } from "@hono/node-server";
-import { Hono } from "hono";
-import { logger } from "hono/logger";
-import { cors } from "hono/cors";
-import dotenv from "dotenv";
-dotenv.config();
+import { createApp } from "./app";
 import connectDb from "./core/config/databse";
-import { securityHeaders } from "./core/middleware/security.middleware";
-import { errorHandler } from "./core/middleware/error.middleware";
-
-const isNetworkDevelopmentMode =
-  process.env.NODE_ENV === "development" && process.argv.includes("--host");
 
 const PORT = Number(process.env.PORT) || 3000;
-const app = new Hono();
 
-// Logger middleware
-app.use(logger());
-
-// Security headers middleware
-app.use(securityHeaders);
-
-// CORS middleware
-app.use(
-  cors({
-    origin: isNetworkDevelopmentMode
-      ? (process.env.CORS_ORIGIN_NETWORK as string)
-      : (process.env.CORS_ORIGIN as string),
-    credentials: true,
-  })
-);
-
-// Welcome route
-app.get("/", (c) => {
-  return c.json(
-    { messge: "Welcome to the Salary Split API (Hono Edition)" },
-    200
-  );
-});
-
-// Error handling middleware
-app.onError(errorHandler);
-
-// Start the app
-connectDb()
-  .then((db) => {
+const start = async () => {
+  try {
+    // Connect to the database
+    const { mongooseConnection } = await connectDb();
     console.log(
       "-------------------------------------------------------------"
     );
-    console.log(`MongoDB connected: ${db.connection.host}`);
+    console.log(`MongoDB connected: ${mongooseConnection.host}`);
+    console.log(`Better Auth database initialized`);
 
+    // create Hono app
+    const app = createApp();
+
+    // Start server
     serve({ fetch: app.fetch, port: PORT }, (info) => {
       console.log(
         `Server running in ${
@@ -59,8 +29,10 @@ connectDb()
         "-------------------------------------------------------------"
       );
     });
-  })
-  .catch((err) => {
-    console.error(`Error: ${err.message}`);
+  } catch (err) {
+    console.error(`Error: ${err instanceof Error ? err.message : err}`);
     process.exit(1);
-  });
+  }
+};
+
+start();
