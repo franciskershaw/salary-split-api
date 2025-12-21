@@ -1,6 +1,6 @@
 import { betterAuth } from "better-auth";
 import { mongodbAdapter } from "better-auth/adapters/mongodb";
-import { mongodb, mongoClient } from "./databse"; // Note: your file is spelled "databse"
+import { mongodb, mongoClient } from "./database";
 
 export const auth = betterAuth({
   database: mongodbAdapter(mongodb, {
