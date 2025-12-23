@@ -1,27 +1,15 @@
 import mongoose from "mongoose";
-import { MongoClient } from "mongodb";
 
-const mongoUri = process.env.MONGO_URI;
-if (!mongoUri) {
-  throw new Error("MONGO_URI is not set");
-}
+const connectDb = async (): Promise<typeof mongoose> => {
+  const mongoUri = process.env.MONGO_URI;
 
-export const mongoClient = new MongoClient(mongoUri);
-export const mongodb = mongoClient.db();
-
-export const connectDb = async () => {
-  try {
-    await mongoose.connect(mongoUri);
-    await mongoClient.connect();
-
-    return {
-      mongooseConnection: mongoose.connection,
-      mongoDatabase: mongodb,
-    };
-  } catch (error) {
-    console.error("Error connecting to MongoDB:", error);
-    throw error;
+  if (!mongoUri) {
+    throw new Error("MONGO_URI is not set");
   }
+  const connection = await mongoose.connect(mongoUri);
+  console.log("-------------------------------------------------------------");
+  console.log(`MongoDB connected on ${connection.connection.host}`);
+  return connection;
 };
 
 export default connectDb;

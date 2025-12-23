@@ -3,7 +3,7 @@ import { logger } from "hono/logger";
 import { cors } from "hono/cors";
 import { securityHeaders } from "./core/middleware/security.middleware";
 import { errorHandler } from "./core/middleware/error.middleware";
-import { auth } from "./core/config/auth";
+
 // Routes imports when ready
 
 const isNetworkDevelopmentMode =
@@ -30,9 +30,6 @@ export const createApp = () => {
       allowHeaders: ["Content-Type", "Authorization"],
     })
   );
-
-  // Auth routes
-  app.on(["POST", "GET"], "/api/auth/**", (c) => auth.handler(c.req.raw));
 
   // Feature routes
 

@@ -8,12 +8,7 @@ const PORT = Number(process.env.PORT) || 3000;
 const start = async () => {
   try {
     // Connect to the database
-    const { mongooseConnection } = await connectDb();
-    console.log(
-      "-------------------------------------------------------------"
-    );
-    console.log(`MongoDB connected: ${mongooseConnection.host}`);
-    console.log(`Better Auth database initialized`);
+    await connectDb();
 
     // create Hono app
     const app = createApp();
