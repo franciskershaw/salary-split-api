@@ -1,0 +1,187 @@
+# auth-api.http
+
+### Variables
+@baseUrl = http://localhost:5300
+@email = test@example.com
+@password = TestPassword123!
+
+### ====================================
+### AUTHENTICATION TESTS
+### ====================================
+
+### 1. Health Check
+GET {{baseUrl}}/
+###
+
+### 2. Register New User (Success)
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "{{email}}",
+  "password": "{{password}}",
+  "name": {
+    "firstName": "Test",
+    "lastName": "User"
+  }
+}
+
+###
+
+### 3. Register Duplicate User (Should Fail - 409)
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "{{email}}",
+  "password": "{{password}}",
+  "name": {
+    "firstName": "Test",
+    "lastName": "User"
+  }
+}
+
+###
+
+### 4. Register - Invalid Email (Should Fail - 400)
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "not-an-email",
+  "password": "{{password}}",
+  "name": {
+    "firstName": "Test",
+    "lastName": "User"
+  }
+}
+
+###
+
+### 5. Register - Password Too Short (Should Fail - 400)
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "newuser@example.com",
+  "password": "short",
+  "name": {
+    "firstName": "Test",
+    "lastName": "User"
+  }
+}
+
+###
+
+### 6. Register - Missing First Name (Should Fail - 400)
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "newuser@example.com",
+  "password": "{{password}}",
+  "name": {
+    "lastName": "User"
+  }
+}
+
+###
+
+### 7. Register - Name Without Last Name (Success - lastName optional)
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "onename@example.com",
+  "password": "{{password}}",
+  "name": {
+    "firstName": "SingleName"
+  }
+}
+
+###
+
+### 8. Register - Missing Password (Should Fail - 400)
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "test2@example.com",
+  "name": {
+    "firstName": "Test",
+    "lastName": "User"
+  }
+}
+
+###
+
+### ====================================
+### LOGIN TESTS (Add these after implementing login)
+### ====================================
+
+### 9. Login User (Success)
+# @name login
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{email}}",
+  "password": "{{password}}"
+}
+
+###
+
+### 10. Login - Wrong Password (Should Fail - 401)
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{email}}",
+  "password": "WrongPassword123!"
+}
+
+###
+
+### 11. Login - User Not Found (Should Fail - 401)
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "nonexistent@example.com",
+  "password": "{{password}}"
+}
+
+###
+
+### ====================================
+### SESSION TESTS (Add after implementing session check)
+### ====================================
+
+### 12. Get Current User Session (Needs Cookie from Login)
+GET {{baseUrl}}/api/auth/session
+###
+
+### 13. Refresh Access Token (Needs Cookie from Login)
+GET {{baseUrl}}/api/auth/refresh-token
+###
+
+### ====================================
+### LOGOUT TESTS
+### ====================================
+
+### 14. Logout
+POST {{baseUrl}}/api/auth/logout
+###
+
+### ====================================
+### PROTECTED ROUTE TESTS (Example)
+### ====================================
+
+### 15. Access Protected Route Without Token (Should Fail - 401)
+GET {{baseUrl}}/api/accounts
+###
+
+### 16. Access Protected Route With Token (Add after login works)
+GET {{baseUrl}}/api/accounts
+Authorization: Bearer {{login.response.body.accessToken}}
+###

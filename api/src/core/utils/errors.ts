@@ -7,8 +7,11 @@ export class BadRequestError extends HTTPException {
 }
 
 export class UnauthorizedError extends HTTPException {
-  constructor(message: string) {
-    super(401, { message: message || "Unauthorized" });
+  errorCode?: string;
+
+  constructor(message: string, errorCode?: string) {
+    super(401, { message });
+    this.errorCode = errorCode;
   }
 }
 
