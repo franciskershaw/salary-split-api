@@ -1,6 +1,6 @@
 ### ===========================================
 ### SHARED VARIABLES
-### Import this file in other test files
+### Copy these variables in other test files that need them
 ### ===========================================
 
 @baseUrl = http://localhost:5300

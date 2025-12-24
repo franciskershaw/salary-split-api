@@ -18,4 +18,6 @@ authRoutes.post(
   authController.localLogin
 );
 
+authRoutes.post("/logout", authController.logout);
+
 export default authRoutes;

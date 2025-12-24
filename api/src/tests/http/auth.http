@@ -2,8 +2,10 @@
 ### AUTHENTICATION TESTS
 ### ===========================================
 
-### Import shared variables
-@import _shared.http
+### Copy shared variables
+@baseUrl = http://localhost:5300
+@email = test@example.com
+@password = TestPassword123!
 
 ### ===========================================
 ### HEALTH CHECK
@@ -194,7 +196,7 @@ GET {{baseUrl}}/api/auth/refresh-token
 ###
 
 ### ===========================================
-### LOGOUT TEST (TODO)
+### LOGOUT TEST
 ### ===========================================
 
 ### Logout
