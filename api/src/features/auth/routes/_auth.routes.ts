@@ -1,14 +1,21 @@
 import { Hono } from "hono";
 import { validate } from "../../../core/utils/validate";
-import localRegister from "../controllers/localRegister.controller";
+import authController from "../controllers/_auth.controller";
 import { localRegisterSchema } from "../validation/localRegister.auth.validation";
+import { localLoginSchema } from "../validation/localLogin.auth.validation";
 
 const authRoutes = new Hono();
 
 authRoutes.post(
   "/register",
   validate("json", localRegisterSchema),
-  localRegister
+  authController.localRegister
+);
+
+authRoutes.post(
+  "/login",
+  validate("json", localLoginSchema),
+  authController.localLogin
 );
 
 export default authRoutes;

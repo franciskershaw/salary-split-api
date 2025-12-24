@@ -1,19 +1,24 @@
-# auth-api.http
-
-### Variables
-@baseUrl = http://localhost:5300
-@email = test@example.com
-@password = TestPassword123!
-
-### ====================================
+### ===========================================
 ### AUTHENTICATION TESTS
-### ====================================
+### ===========================================
 
-### 1. Health Check
+### Import shared variables
+@import _shared.http
+
+### ===========================================
+### HEALTH CHECK
+### ===========================================
+
+### Health Check
 GET {{baseUrl}}/
+
 ###
 
-### 2. Register New User (Success)
+### ===========================================
+### REGISTER TESTS
+### ===========================================
+
+### Register - Success (201)
 POST {{baseUrl}}/api/auth/register
 Content-Type: application/json
 
@@ -28,7 +33,7 @@ Content-Type: application/json
 
 ###
 
-### 3. Register Duplicate User (Should Fail - 409)
+### Register - Duplicate User (409)
 POST {{baseUrl}}/api/auth/register
 Content-Type: application/json
 
@@ -43,7 +48,7 @@ Content-Type: application/json
 
 ###
 
-### 4. Register - Invalid Email (Should Fail - 400)
+### Register - Invalid Email (400)
 POST {{baseUrl}}/api/auth/register
 Content-Type: application/json
 
@@ -58,7 +63,7 @@ Content-Type: application/json
 
 ###
 
-### 5. Register - Password Too Short (Should Fail - 400)
+### Register - Password Too Short (400)
 POST {{baseUrl}}/api/auth/register
 Content-Type: application/json
 
@@ -73,12 +78,12 @@ Content-Type: application/json
 
 ###
 
-### 6. Register - Missing First Name (Should Fail - 400)
+### Register - Missing First Name (400)
 POST {{baseUrl}}/api/auth/register
 Content-Type: application/json
 
 {
-  "email": "newuser@example.com",
+  "email": "newuser2@example.com",
   "password": "{{password}}",
   "name": {
     "lastName": "User"
@@ -87,7 +92,7 @@ Content-Type: application/json
 
 ###
 
-### 7. Register - Name Without Last Name (Success - lastName optional)
+### Register - No Last Name (Success - lastName optional)
 POST {{baseUrl}}/api/auth/register
 Content-Type: application/json
 
@@ -101,7 +106,7 @@ Content-Type: application/json
 
 ###
 
-### 8. Register - Missing Password (Should Fail - 400)
+### Register - Missing Password (400)
 POST {{baseUrl}}/api/auth/register
 Content-Type: application/json
 
@@ -115,11 +120,11 @@ Content-Type: application/json
 
 ###
 
-### ====================================
-### LOGIN TESTS (Add these after implementing login)
-### ====================================
+### ===========================================
+### LOGIN TESTS
+### ===========================================
 
-### 9. Login User (Success)
+### Login - Success (200) - SAVE TOKEN
 # @name login
 POST {{baseUrl}}/api/auth/login
 Content-Type: application/json
@@ -131,7 +136,7 @@ Content-Type: application/json
 
 ###
 
-### 10. Login - Wrong Password (Should Fail - 401)
+### Login - Wrong Password (401)
 POST {{baseUrl}}/api/auth/login
 Content-Type: application/json
 
@@ -142,7 +147,7 @@ Content-Type: application/json
 
 ###
 
-### 11. Login - User Not Found (Should Fail - 401)
+### Login - User Not Found (401)
 POST {{baseUrl}}/api/auth/login
 Content-Type: application/json
 
@@ -153,35 +158,46 @@ Content-Type: application/json
 
 ###
 
-### ====================================
-### SESSION TESTS (Add after implementing session check)
-### ====================================
+### Login - Invalid Email Format (400)
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
 
-### 12. Get Current User Session (Needs Cookie from Login)
+{
+  "email": "not-an-email",
+  "password": "{{password}}"
+}
+
+###
+
+### Login - Missing Password (400)
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{email}}"
+}
+
+###
+
+### ===========================================
+### SESSION & REFRESH TESTS (TODO)
+### ===========================================
+
+### Get Current Session
 GET {{baseUrl}}/api/auth/session
+
 ###
 
-### 13. Refresh Access Token (Needs Cookie from Login)
+### Refresh Access Token
 GET {{baseUrl}}/api/auth/refresh-token
+
 ###
 
-### ====================================
-### LOGOUT TESTS
-### ====================================
+### ===========================================
+### LOGOUT TEST (TODO)
+### ===========================================
 
-### 14. Logout
+### Logout
 POST {{baseUrl}}/api/auth/logout
-###
 
-### ====================================
-### PROTECTED ROUTE TESTS (Example)
-### ====================================
-
-### 15. Access Protected Route Without Token (Should Fail - 401)
-GET {{baseUrl}}/api/accounts
-###
-
-### 16. Access Protected Route With Token (Add after login works)
-GET {{baseUrl}}/api/accounts
-Authorization: Bearer {{login.response.body.accessToken}}
 ###
