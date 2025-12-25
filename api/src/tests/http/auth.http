@@ -2,7 +2,6 @@
 ### AUTHENTICATION TESTS
 ### ===========================================
 
-### Copy shared variables
 @baseUrl = http://localhost:5300
 @email = test@example.com
 @password = TestPassword123!
@@ -184,9 +183,6 @@ Content-Type: application/json
 ### ===========================================
 ### SESSION & REFRESH TESTS (TODO)
 ### ===========================================
-
-### Get Current Session
-GET {{baseUrl}}/api/auth/session
 
 ###
 

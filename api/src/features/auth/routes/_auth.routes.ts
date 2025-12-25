@@ -3,6 +3,8 @@ import { validate } from "../../../core/utils/validate";
 import authController from "../controllers/_auth.controller";
 import { localRegisterSchema } from "../validation/localRegister.auth.validation";
 import { localLoginSchema } from "../validation/localLogin.auth.validation";
+import { googleAuth } from "../controllers/OAuth/google/googleAuth.controller";
+import { googleCallback } from "../controllers/OAuth/google/googleCallback.controller";
 
 const authRoutes = new Hono();
 
@@ -19,5 +21,8 @@ authRoutes.post(
 );
 
 authRoutes.post("/logout", authController.logout);
+
+authRoutes.get("/google", googleAuth);
+authRoutes.get("/google/callback", googleCallback);
 
 export default authRoutes;
