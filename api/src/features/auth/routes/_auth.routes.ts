@@ -25,4 +25,6 @@ authRoutes.post("/logout", authController.logout);
 authRoutes.get("/google", googleAuth);
 authRoutes.get("/google/callback", googleCallback);
 
+authRoutes.get("/refresh-token", authController.refreshTokens);
+
 export default authRoutes;
