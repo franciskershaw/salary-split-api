@@ -1,5 +1,5 @@
-import localRegister from "./localRegister.controller";
-import localLogin from "./localLogin.controller";
+import localRegister from "./local/localRegister.controller";
+import localLogin from "./local/localLogin.controller";
 import logout from "./logout.controller";
 
 export default {

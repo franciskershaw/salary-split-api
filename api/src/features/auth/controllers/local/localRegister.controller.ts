@@ -1,11 +1,11 @@
 // Registers a new user using email and password
 
 import { Context } from "hono";
-import { ConflictError } from "../../../core/utils/errors";
-import User from "../../users/model/user.model";
+import { ConflictError } from "../../../../core/utils/errors";
+import User from "../../../users/model/user.model";
 import bcrypt from "bcryptjs";
-import { sendTokensAndUser } from "../utils/auth.helper";
-import { LocalRegisterInput } from "../validation/localRegister.auth.validation";
+import { sendTokensAndUser } from "../../utils/auth.helper";
+import { LocalRegisterInput } from "../../validation/localRegister.auth.validation";
 
 const localRegister = async (c: Context) => {
   const { email, password, name } = await c.req.json<LocalRegisterInput>();
