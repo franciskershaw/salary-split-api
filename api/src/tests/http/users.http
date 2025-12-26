@@ -1,0 +1,166 @@
+### ===========================================
+### USER TESTS
+### ===========================================
+
+@baseUrl = http://localhost:5300
+@email = test@example.com
+@password = TestPassword123!
+
+### ===========================================
+### SETUP - LOGIN TO GET TOKEN
+### ===========================================
+
+### Login - Get Access Token
+# @name login
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{email}}",
+  "password": "{{password}}"
+}
+
+###
+
+@accessToken = {{login.response.body.accessToken}}
+
+### ===========================================
+### GET USER INFO
+### ===========================================
+
+### Get User Info - Success (200)
+GET {{baseUrl}}/api/users
+Authorization: Bearer {{accessToken}}
+
+###
+
+### Get User Info - No Token (401)
+GET {{baseUrl}}/api/users
+
+###
+
+### Get User Info - Invalid Token (401)
+GET {{baseUrl}}/api/users
+Authorization: Bearer invalid.token.here
+
+###
+
+### Get User Info - Malformed Authorization Header (401)
+GET {{baseUrl}}/api/users
+Authorization: {{accessToken}}
+
+###
+
+### ===========================================
+### UPDATE USER (TODO - when controller ready)
+### ===========================================
+
+### Update User - Success (200)
+# PUT {{baseUrl}}/api/users/
+# Authorization: Bearer {{accessToken}}
+# Content-Type: application/json
+#
+# {
+#   "name": {
+#     "firstName": "Updated",
+#     "lastName": "Name"
+#   },
+#   "takeHomePay": 50000,
+#   "defaultCurrency": "GBP"
+# }
+
+###
+
+### ===========================================
+### UPDATE SALARY (TODO - when controller ready)
+### ===========================================
+
+### Update Salary - Success (200)
+# PUT {{baseUrl}}/api/users/salary
+# Authorization: Bearer {{accessToken}}
+# Content-Type: application/json
+#
+# {
+#   "salary": 55000.50
+# }
+
+###
+
+### Update Salary - Invalid (Negative) (400)
+# PUT {{baseUrl}}/api/users/salary
+# Authorization: Bearer {{accessToken}}
+# Content-Type: application/json
+#
+# {
+#   "salary": -1000
+# }
+
+###
+
+### Update Salary - Invalid (Too Many Decimals) (400)
+# PUT {{baseUrl}}/api/users/salary
+# Authorization: Bearer {{accessToken}}
+# Content-Type: application/json
+#
+# {
+#   "salary": 50000.999
+# }
+
+###
+
+### ===========================================
+### UPDATE THEME (TODO - when controller ready)
+### ===========================================
+
+### Update Theme - Success (200)
+# PUT {{baseUrl}}/api/users/theme
+# Authorization: Bearer {{accessToken}}
+# Content-Type: application/json
+#
+# {
+#   "defaultTheme": "dark"
+# }
+
+###
+
+### Update Theme - Invalid Value (400)
+# PUT {{baseUrl}}/api/users/theme
+# Authorization: Bearer {{accessToken}}
+# Content-Type: application/json
+#
+# {
+#   "defaultTheme": "blue"
+# }
+
+###
+
+### ===========================================
+### UPDATE FILTERS (TODO - when controller ready)
+### ===========================================
+
+### Update Account Filters - Success (200)
+# PUT {{baseUrl}}/api/users/account-filters
+# Authorization: Bearer {{accessToken}}
+# Content-Type: application/json
+#
+# [
+#   { "type": "current", "enabled": true },
+#   { "type": "savings", "enabled": false },
+#   { "type": "investment", "enabled": true },
+#   { "type": "joint", "enabled": false }
+# ]
+
+###
+
+### Update Bill Filters - Success (200)
+# PUT {{baseUrl}}/api/users/bill-filters
+# Authorization: Bearer {{accessToken}}
+# Content-Type: application/json
+#
+# [
+#   { "type": "housing", "enabled": true },
+#   { "type": "utilities", "enabled": true },
+#   { "type": "entertainment", "enabled": false }
+# ]
+
+###

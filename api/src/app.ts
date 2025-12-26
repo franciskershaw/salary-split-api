@@ -4,6 +4,7 @@ import { cors } from "hono/cors";
 import { securityHeaders } from "./core/middleware/security.middleware";
 import { errorHandler } from "./core/middleware/error.middleware";
 import authRoutes from "./features/auth/routes/_auth.routes";
+import userRoutes from "./features/users/routes/_user.routes";
 
 const isNetworkDevelopmentMode =
   process.env.NODE_ENV === "development" && process.argv.includes("--host");
@@ -32,6 +33,7 @@ export const createApp = () => {
 
   // Feature routes
   app.route("/api/auth", authRoutes);
+  app.route("/api/users", userRoutes);
 
   // Welcome / Health check route
   app.get("/", (c) =>
