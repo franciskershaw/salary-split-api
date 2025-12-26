@@ -13,16 +13,23 @@ export const errorHandler: ErrorHandler = (err, c) => {
 
   // Handle Zod validation errors
   if (err instanceof ZodError) {
-    return c.json(
-      {
-        message: "Validation error",
-        errors: err.issues.map((issue) => ({
-          field: issue.path.join("."),
-          message: issue.message,
-        })),
-      },
-      400
-    );
+    const errors = err.issues.map((issue) => {
+      let message = issue.message;
+
+      // Check for "required field" errors using error code
+      if (issue.code === "invalid_type" && issue.expected === "string") {
+        // Get the field name from the path
+        const fieldName = issue.path[issue.path.length - 1];
+        message = `${String(fieldName)} is required.`;
+      }
+
+      return {
+        field: issue.path.join("."),
+        message: message,
+      };
+    });
+
+    return c.json({ message: "Validation error", errors }, 400);
   }
 
   // UnauthorizedError (only one that needs errorCode)
