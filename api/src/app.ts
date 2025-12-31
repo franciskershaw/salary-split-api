@@ -5,6 +5,7 @@ import { securityHeaders } from "./core/middleware/security.middleware";
 import { errorHandler } from "./core/middleware/error.middleware";
 import authRoutes from "./features/auth/routes/_auth.routes";
 import userRoutes from "./features/users/routes/_user.routes";
+import accountRoutes from "./features/accounts/routes/_account.routes";
 
 const isNetworkDevelopmentMode =
   process.env.NODE_ENV === "development" && process.argv.includes("--host");
@@ -34,6 +35,7 @@ export const createApp = () => {
   // Feature routes
   app.route("/api/auth", authRoutes);
   app.route("/api/users", userRoutes);
+  app.route("/api/accounts", accountRoutes);
 
   // Welcome / Health check route
   app.get("/", (c) =>
