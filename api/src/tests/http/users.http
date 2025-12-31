@@ -291,35 +291,35 @@ Content-Type: application/json
 ### ===========================================
 
 ### Update Salary - Success (200)
-# PUT {{baseUrl}}/api/users/salary
-# Authorization: Bearer {{accessToken}}
-# Content-Type: application/json
-#
-# {
-#   "salary": 55000.50
-# }
+PATCH {{baseUrl}}/api/users/salary
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "salary": 55000.50
+}
 
 ###
 
 ### Update Salary - Invalid (Negative) (400)
-# PUT {{baseUrl}}/api/users/salary
-# Authorization: Bearer {{accessToken}}
-# Content-Type: application/json
-#
-# {
-#   "salary": -1000
-# }
+PATCH {{baseUrl}}/api/users/salary
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "salary": -1000
+}
 
 ###
 
 ### Update Salary - Invalid (Too Many Decimals) (400)
-# PUT {{baseUrl}}/api/users/salary
-# Authorization: Bearer {{accessToken}}
-# Content-Type: application/json
-#
-# {
-#   "salary": 50000.999
-# }
+PATCH {{baseUrl}}/api/users/salary
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "salary": 50000.999
+}
 
 ###
 

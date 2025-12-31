@@ -5,6 +5,7 @@ import { validate } from "../../../core/utils/validate";
 import { updateUserSchema } from "../validation/updateUser.user.validation";
 import { updateAccountFiltersSchema } from "../validation/accountFilters.user.validation";
 import { updateBillFiltersSchema } from "../validation/billFilters.user.validation";
+import { updateSalarySchema } from "../validation/salary.user.validation";
 
 const userRoutes = new Hono();
 
@@ -15,6 +16,13 @@ userRoutes.put(
   authenticate,
   validate("json", updateUserSchema),
   userController.updateUser
+);
+
+userRoutes.patch(
+  "/salary",
+  authenticate,
+  validate("json", updateSalarySchema),
+  userController.updateSalary
 );
 
 userRoutes.put(
