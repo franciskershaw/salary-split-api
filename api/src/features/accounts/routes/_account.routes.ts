@@ -4,7 +4,7 @@ import validateObjectId from "../../../core/middleware/validateObjectId.middlewa
 import accountController from "../controllers/_account.controller";
 import { validate } from "../../../core/utils/validate";
 import { accountSchema } from "../validation/account.validation";
-// import { reorderAccountsSchema } from "../validation/reorderAccounts.validation";
+import { reorderAccountsSchema } from "../validation/reorderAccounts.validation";
 
 const accountRoutes = new Hono();
 
@@ -17,7 +17,12 @@ accountRoutes.post(
   accountController.addAccount
 );
 
-// accountRoutes.put("/reorder", authenticate, validate("json", reorderAccountsSchema), accountController.reorderAccounts);
+accountRoutes.put(
+  "/reorder",
+  authenticate,
+  validate("json", reorderAccountsSchema),
+  accountController.reorderAccounts
+);
 
 accountRoutes.put(
   "/:accountId",

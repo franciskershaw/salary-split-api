@@ -398,15 +398,57 @@ Content-Type: application/json
 ### REORDER ACCOUNTS
 ### ===========================================
 
+### Setup - Create Account 1 for Reordering
+# @name reorderAccount1
+POST {{baseUrl}}/api/accounts
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Reorder Test 1"
+}
+
+###
+
+@reorderAccountId1 = {{reorderAccount1.response.body._id}}
+
+### Setup - Create Account 2 for Reordering
+# @name reorderAccount2
+POST {{baseUrl}}/api/accounts
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Reorder Test 2"
+}
+
+###
+
+@reorderAccountId2 = {{reorderAccount2.response.body._id}}
+
+### Setup - Create Account 3 for Reordering
+# @name reorderAccount3
+POST {{baseUrl}}/api/accounts
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Reorder Test 3"
+}
+
+###
+
+@reorderAccountId3 = {{reorderAccount3.response.body._id}}
+
 ### Reorder Accounts - Success (200)
 PUT {{baseUrl}}/api/accounts/reorder
 Authorization: Bearer {{accessToken}}
 Content-Type: application/json
 
 [
-  "507f1f77bcf86cd799439011",
-  "507f1f77bcf86cd799439012",
-  "507f1f77bcf86cd799439013"
+  "{{reorderAccountId3}}",
+  "{{reorderAccountId1}}",
+  "{{reorderAccountId2}}"
 ]
 
 ###
@@ -416,8 +458,8 @@ PUT {{baseUrl}}/api/accounts/reorder
 Content-Type: application/json
 
 [
-  "507f1f77bcf86cd799439011",
-  "507f1f77bcf86cd799439012"
+  "{{reorderAccountId1}}",
+  "{{reorderAccountId2}}"
 ]
 
 ###
@@ -428,8 +470,8 @@ Authorization: Bearer invalid.token.here
 Content-Type: application/json
 
 [
-  "507f1f77bcf86cd799439011",
-  "507f1f77bcf86cd799439012"
+  "{{reorderAccountId1}}",
+  "{{reorderAccountId2}}"
 ]
 
 ###
@@ -450,7 +492,7 @@ Content-Type: application/json
 
 [
   "invalid-id",
-  "507f1f77bcf86cd799439012"
+  "{{reorderAccountId1}}"
 ]
 
 ###
@@ -461,7 +503,7 @@ Authorization: Bearer {{accessToken}}
 Content-Type: application/json
 
 {
-  "ids": ["507f1f77bcf86cd799439011"]
+  "ids": ["{{reorderAccountId1}}"]
 }
 
 ###
