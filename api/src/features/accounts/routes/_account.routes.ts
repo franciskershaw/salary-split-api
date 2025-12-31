@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import { authenticate } from "../../../core/middleware/auth.middleware";
+import validateObjectId from "../../../core/middleware/validateObjectId.middleware";
 import accountController from "../controllers/_account.controller";
 import { validate } from "../../../core/utils/validate";
 import { accountSchema } from "../validation/account.validation";
@@ -21,10 +22,16 @@ accountRoutes.post(
 accountRoutes.put(
   "/:accountId",
   authenticate,
+  validateObjectId("accountId"),
   validate("json", accountSchema),
   accountController.editAccount
 );
 
-// accountRoutes.delete("/:accountId", authenticate, accountController.deleteAccount);
+accountRoutes.delete(
+  "/:accountId",
+  authenticate,
+  validateObjectId("accountId"),
+  accountController.deleteAccount
+);
 
 export default accountRoutes;

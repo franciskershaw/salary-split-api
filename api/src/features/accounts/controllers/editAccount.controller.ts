@@ -14,10 +14,6 @@ const editAccount = async (c: Context) => {
     const body = await c.req.json();
     const accountId = c.req.param("accountId");
 
-    if (!mongoose.Types.ObjectId.isValid(accountId)) {
-      throw new BadRequestError("Invalid account ID format");
-    }
-
     // Separate fields to update vs fields to unset
     const updateFields: any = { ...body };
     const unsetFields: any = {};

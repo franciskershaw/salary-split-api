@@ -56,12 +56,11 @@ Authorization: Bearer {{accessToken}}
 Content-Type: application/json
 
 {
-  "name": "Main Checking",
+  "name": "Not default",
   "amount": 5000,
   "acceptsFunds": true,
   "receivesSalary": true,
   "type": "current",
-  "isDefault": true,
   "institution": "Chase Bank"
 }
 
