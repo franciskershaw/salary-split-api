@@ -3,11 +3,11 @@ import { BILL_TYPES } from "../../../core/utils/constants";
 
 const billTypeValues = Object.values(BILL_TYPES);
 
-export const updateBillFilterSchema = z.array(
+export const updateBillFiltersSchema = z.array(
   z.object({
     type: z.enum(billTypeValues),
     enabled: z.boolean(),
   })
 );
 
-export type UpdateBillFilterInput = z.infer<typeof updateBillFilterSchema>;
+export type UpdateBillFilterInput = z.infer<typeof updateBillFiltersSchema>;

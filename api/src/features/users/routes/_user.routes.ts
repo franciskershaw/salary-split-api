@@ -3,6 +3,7 @@ import { authenticate } from "../../../core/middleware/auth.middleware";
 import userController from "../controllers/_user.controller";
 import { validate } from "../../../core/utils/validate";
 import { updateUserSchema } from "../validation/updateUser.user.validation";
+import { updateAccountFiltersSchema } from "../validation/accountFilters.user.validation";
 
 const userRoutes = new Hono();
 
@@ -15,7 +16,12 @@ userRoutes.put(
   userController.updateUser
 );
 
-// userRoutes.put("/account-filters", authenticate, userController.updateFilters)
+userRoutes.put(
+  "/account-filters",
+  authenticate,
+  validate("json", updateAccountFiltersSchema),
+  userController.updateFilters
+);
 
 // userRoutes.put("/bill-filters", authenticate, userController.updateFilters)
 

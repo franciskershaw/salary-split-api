@@ -354,16 +354,16 @@ Content-Type: application/json
 ### ===========================================
 
 ### Update Account Filters - Success (200)
-# PUT {{baseUrl}}/api/users/account-filters
-# Authorization: Bearer {{accessToken}}
-# Content-Type: application/json
-#
-# [
-#   { "type": "current", "enabled": true },
-#   { "type": "savings", "enabled": false },
-#   { "type": "investment", "enabled": true },
-#   { "type": "joint", "enabled": false }
-# ]
+PUT {{baseUrl}}/api/users/account-filters
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+[
+  { "type": "current", "enabled": true },
+  { "type": "savings", "enabled": false },
+  { "type": "investment", "enabled": true },
+  { "type": "joint", "enabled": false }
+]
 
 ###
 
