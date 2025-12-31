@@ -6,6 +6,7 @@ import { updateUserSchema } from "../validation/updateUser.user.validation";
 import { updateAccountFiltersSchema } from "../validation/accountFilters.user.validation";
 import { updateBillFiltersSchema } from "../validation/billFilters.user.validation";
 import { updateSalarySchema } from "../validation/salary.user.validation";
+import { updateThemeSchema } from "../validation/updateTheme.user.validation";
 
 const userRoutes = new Hono();
 
@@ -53,6 +54,11 @@ userRoutes.put(
   userController.updateFilters
 );
 
-// userRoutes.put("/theme", authenticate, userController.updateTheme)
+userRoutes.put(
+  "/theme",
+  authenticate,
+  validate("json", updateThemeSchema),
+  userController.updateTheme
+);
 
 export default userRoutes;

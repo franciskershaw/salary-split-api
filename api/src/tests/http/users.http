@@ -328,24 +328,24 @@ Content-Type: application/json
 ### ===========================================
 
 ### Update Theme - Success (200)
-# PUT {{baseUrl}}/api/users/theme
-# Authorization: Bearer {{accessToken}}
-# Content-Type: application/json
-#
-# {
-#   "defaultTheme": "dark"
-# }
+PUT {{baseUrl}}/api/users/theme
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "defaultTheme": "dark"
+}
 
 ###
 
 ### Update Theme - Invalid Value (400)
-# PUT {{baseUrl}}/api/users/theme
-# Authorization: Bearer {{accessToken}}
-# Content-Type: application/json
-#
-# {
-#   "defaultTheme": "blue"
-# }
+PUT {{baseUrl}}/api/users/theme
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "defaultTheme": "blue"
+}
 
 ###
 
