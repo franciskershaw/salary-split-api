@@ -368,14 +368,54 @@ Content-Type: application/json
 ###
 
 ### Update Bill Filters - Success (200)
-# PUT {{baseUrl}}/api/users/bill-filters
-# Authorization: Bearer {{accessToken}}
-# Content-Type: application/json
-#
-# [
-#   { "type": "housing", "enabled": true },
-#   { "type": "utilities", "enabled": true },
-#   { "type": "entertainment", "enabled": false }
-# ]
+PUT {{baseUrl}}/api/users/bill-filters
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+[
+  { "type": "housing", "enabled": true },
+  { "type": "utilities", "enabled": true },
+  { "type": "entertainment", "enabled": false }
+]
+
+###
+
+### Update Expense Filters - Success (200)
+PUT {{baseUrl}}/api/users/expense-filters
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+[
+  { "type": "food", "enabled": true },
+  { "type": "transport", "enabled": true },
+  { "type": "entertainment", "enabled": false }
+]
+
+###
+
+### Update Savings Filters - Success (200)
+PUT {{baseUrl}}/api/users/savings-filters
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+[
+  { "type": "communication", "enabled": true },  
+  { "type": "transport", "enabled": false }
+]
+
+###
+
+### ===========================================
+### UPDATE FILTERS - INVALID
+### ===========================================
+
+### Update Account Filters - Invalid Filter Type (400)
+PUT {{baseUrl}}/api/users/account-filters
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+[
+  { "type": "invalid", "enabled": true }
+]
 
 ###

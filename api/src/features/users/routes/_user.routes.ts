@@ -4,6 +4,7 @@ import userController from "../controllers/_user.controller";
 import { validate } from "../../../core/utils/validate";
 import { updateUserSchema } from "../validation/updateUser.user.validation";
 import { updateAccountFiltersSchema } from "../validation/accountFilters.user.validation";
+import { updateBillFiltersSchema } from "../validation/billFilters.user.validation";
 
 const userRoutes = new Hono();
 
@@ -23,11 +24,26 @@ userRoutes.put(
   userController.updateFilters
 );
 
-// userRoutes.put("/bill-filters", authenticate, userController.updateFilters)
+userRoutes.put(
+  "/bill-filters",
+  authenticate,
+  validate("json", updateBillFiltersSchema),
+  userController.updateFilters
+);
 
-// userRoutes.put("/expense-filters", authenticate, userController.updateFilters)
+userRoutes.put(
+  "/expense-filters",
+  authenticate,
+  validate("json", updateBillFiltersSchema),
+  userController.updateFilters
+);
 
-// userRoutes.put("/savings-filters", authenticate, userController.updateFilters)
+userRoutes.put(
+  "/savings-filters",
+  authenticate,
+  validate("json", updateBillFiltersSchema),
+  userController.updateFilters
+);
 
 // userRoutes.put("/theme", authenticate, userController.updateTheme)
 
