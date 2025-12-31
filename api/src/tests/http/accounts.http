@@ -286,7 +286,6 @@ Content-Type: application/json
   "acceptsFunds": true,
   "receivesSalary": false,
   "type": "current",
-  "isDefault": false,
   "institution": "Updated Bank"
 }
 

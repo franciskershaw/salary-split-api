@@ -18,7 +18,12 @@ accountRoutes.post(
 
 // accountRoutes.put("/reorder", authenticate, validate("json", reorderAccountsSchema), accountController.reorderAccounts);
 
-// accountRoutes.put("/:accountId", authenticate, validate("json", accountSchema), accountController.editAccount);
+accountRoutes.put(
+  "/:accountId",
+  authenticate,
+  validate("json", accountSchema),
+  accountController.editAccount
+);
 
 // accountRoutes.delete("/:accountId", authenticate, accountController.deleteAccount);
 
