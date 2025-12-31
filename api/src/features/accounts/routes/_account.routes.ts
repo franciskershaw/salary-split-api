@@ -7,7 +7,7 @@ import { accountSchema } from "../validation/account.validation";
 
 const accountRoutes = new Hono();
 
-// accountRoutes.get("/", authenticate, accountController.getAccounts);
+accountRoutes.get("/", authenticate, accountController.getAccounts);
 
 accountRoutes.post(
   "/",
