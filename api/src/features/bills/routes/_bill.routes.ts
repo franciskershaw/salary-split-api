@@ -4,7 +4,7 @@ import validateObjectId from "../../../core/middleware/validateObjectId.middlewa
 import billController from "../controllers/_bill.controller";
 import { validate } from "../../../core/utils/validate";
 import { billSchema } from "../validation/bill.validation";
-// import { reorderBillsSchema } from "../validation/reorderBills.validation";
+import { reorderBillsSchema } from "../validation/reorderBills.validation";
 
 const billRoutes = new Hono();
 
@@ -17,12 +17,12 @@ billRoutes.post(
   billController.addBill
 );
 
-// billRoutes.put(
-//   "/reorder",
-//   authenticate,
-//   validate("json", reorderBillsSchema),
-//   billController.reorderBills
-// );
+billRoutes.put(
+  "/reorder",
+  authenticate,
+  validate("json", reorderBillsSchema),
+  billController.reorderBills
+);
 
 billRoutes.put(
   "/:billId",
