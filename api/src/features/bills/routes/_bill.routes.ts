@@ -8,7 +8,7 @@ import { billSchema } from "../validation/bill.validation";
 
 const billRoutes = new Hono();
 
-// billRoutes.get("/", authenticate, billController.getBills);
+billRoutes.get("/", authenticate, billController.getBills);
 
 billRoutes.post(
   "/",
