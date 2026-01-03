@@ -1,0 +1,708 @@
+### ===========================================
+### BILL TESTS
+### ===========================================
+
+@baseUrl = http://localhost:5300
+@email = test@example.com
+@password = TestPassword123!
+
+### ===========================================
+### SETUP - LOGIN TO GET TOKEN & CREATE ACCOUNT
+### ===========================================
+
+### Login - Get Access Token
+# @name login
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{email}}",
+  "password": "{{password}}"
+}
+
+###
+
+@accessToken = {{login.response.body.accessToken}}
+
+### Setup - Create Account for Bills
+# @name setupAccount
+POST {{baseUrl}}/api/accounts
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Bills Test Account"
+}
+
+###
+
+@testAccountId = {{setupAccount.response.body._id}}
+
+### ===========================================
+### GET ALL BILLS
+### ===========================================
+
+### Get All Bills - Success (200)
+GET {{baseUrl}}/api/bills
+Authorization: Bearer {{accessToken}}
+
+###
+
+### Get All Bills - No Token (401)
+GET {{baseUrl}}/api/bills
+
+###
+
+### Get All Bills - Invalid Token (401)
+GET {{baseUrl}}/api/bills
+Authorization: Bearer invalid.token.here
+
+###
+
+### ===========================================
+### ADD BILL
+### ===========================================
+
+### Add Bill - Success (201)
+# @name addBill
+POST {{baseUrl}}/api/bills
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Rent",
+  "amount": 1200,
+  "dueDate": 1,
+  "account": "{{testAccountId}}",
+  "type": "housing",
+  "splitBetween": 2
+}
+
+###
+
+@billId = {{addBill.response.body._id}}
+
+### Add Bill - Minimal (Success with defaults) (201)
+POST {{baseUrl}}/api/bills
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Netflix",
+  "amount": 15.99,
+  "dueDate": 15,
+  "account": "{{testAccountId}}",
+  "type": "entertainment"
+}
+
+###
+
+### Add Bill - No Token (401)
+POST {{baseUrl}}/api/bills
+Content-Type: application/json
+
+{
+  "name": "Test Bill",
+  "amount": 100,
+  "dueDate": 1,
+  "account": "{{testAccountId}}",
+  "type": "utilities"
+}
+
+###
+
+### Add Bill - Invalid Token (401)
+POST {{baseUrl}}/api/bills
+Authorization: Bearer invalid.token.here
+Content-Type: application/json
+
+{
+  "name": "Test Bill",
+  "amount": 100,
+  "dueDate": 1,
+  "account": "{{testAccountId}}",
+  "type": "utilities"
+}
+
+###
+
+### Add Bill - Missing Name (400)
+POST {{baseUrl}}/api/bills
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "amount": 100,
+  "dueDate": 1,
+  "account": "{{testAccountId}}",
+  "type": "utilities"
+}
+
+###
+
+### Add Bill - Empty Name (400)
+POST {{baseUrl}}/api/bills
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "",
+  "amount": 100,
+  "dueDate": 1,
+  "account": "{{testAccountId}}",
+  "type": "utilities"
+}
+
+###
+
+### Add Bill - Missing Amount (400)
+POST {{baseUrl}}/api/bills
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Test Bill",
+  "dueDate": 1,
+  "account": "{{testAccountId}}",
+  "type": "utilities"
+}
+
+###
+
+### Add Bill - Negative Amount (400)
+POST {{baseUrl}}/api/bills
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Test Bill",
+  "amount": -100,
+  "dueDate": 1,
+  "account": "{{testAccountId}}",
+  "type": "utilities"
+}
+
+###
+
+### Add Bill - Invalid Amount Type (400)
+POST {{baseUrl}}/api/bills
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Test Bill",
+  "amount": "100",
+  "dueDate": 1,
+  "account": "{{testAccountId}}",
+  "type": "utilities"
+}
+
+###
+
+### Add Bill - Missing Due Date (400)
+POST {{baseUrl}}/api/bills
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Test Bill",
+  "amount": 100,
+  "account": "{{testAccountId}}",
+  "type": "utilities"
+}
+
+###
+
+### Add Bill - Due Date Too Low (400)
+POST {{baseUrl}}/api/bills
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Test Bill",
+  "amount": 100,
+  "dueDate": 0,
+  "account": "{{testAccountId}}",
+  "type": "utilities"
+}
+
+###
+
+### Add Bill - Due Date Too High (400)
+POST {{baseUrl}}/api/bills
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Test Bill",
+  "amount": 100,
+  "dueDate": 32,
+  "account": "{{testAccountId}}",
+  "type": "utilities"
+}
+
+###
+
+### Add Bill - Due Date Not Integer (400)
+POST {{baseUrl}}/api/bills
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Test Bill",
+  "amount": 100,
+  "dueDate": 15.5,
+  "account": "{{testAccountId}}",
+  "type": "utilities"
+}
+
+###
+
+### Add Bill - Missing Account (400)
+POST {{baseUrl}}/api/bills
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Test Bill",
+  "amount": 100,
+  "dueDate": 1,
+  "type": "utilities"
+}
+
+###
+
+### Add Bill - Empty Account (400)
+POST {{baseUrl}}/api/bills
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Test Bill",
+  "amount": 100,
+  "dueDate": 1,
+  "account": "",
+  "type": "utilities"
+}
+
+###
+
+### Add Bill - Invalid Account ID Format (400)
+POST {{baseUrl}}/api/bills
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Test Bill",
+  "amount": 100,
+  "dueDate": 1,
+  "account": "invalid-id",
+  "type": "utilities"
+}
+
+###
+
+### Add Bill - Missing Type (400)
+POST {{baseUrl}}/api/bills
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Test Bill",
+  "amount": 100,
+  "dueDate": 1,
+  "account": "{{testAccountId}}"
+}
+
+###
+
+### Add Bill - Invalid Type (400)
+POST {{baseUrl}}/api/bills
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Test Bill",
+  "amount": 100,
+  "dueDate": 1,
+  "account": "{{testAccountId}}",
+  "type": "invalid-type"
+}
+
+###
+
+### Add Bill - splitBetween Too Low (400)
+POST {{baseUrl}}/api/bills
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Test Bill",
+  "amount": 100,
+  "dueDate": 1,
+  "account": "{{testAccountId}}",
+  "type": "utilities",
+  "splitBetween": 0
+}
+
+###
+
+### Add Bill - splitBetween Too High (400)
+POST {{baseUrl}}/api/bills
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Test Bill",
+  "amount": 100,
+  "dueDate": 1,
+  "account": "{{testAccountId}}",
+  "type": "utilities",
+  "splitBetween": 11
+}
+
+###
+
+### Add Bill - splitBetween Not Integer (400)
+POST {{baseUrl}}/api/bills
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Test Bill",
+  "amount": 100,
+  "dueDate": 1,
+  "account": "{{testAccountId}}",
+  "type": "utilities",
+  "splitBetween": 2.5
+}
+
+###
+
+### ===========================================
+### UPDATE BILL
+### ===========================================
+
+### Update Bill - Success (200)
+PUT {{baseUrl}}/api/bills/{{billId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Updated Rent",
+  "amount": 1300,
+  "dueDate": 5,
+  "account": "{{testAccountId}}",
+  "type": "housing",
+  "splitBetween": 3
+}
+
+###
+
+### Update Bill - Change Type (200)
+PUT {{baseUrl}}/api/bills/{{billId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Updated Bill",
+  "amount": 100,
+  "dueDate": 15,
+  "account": "{{testAccountId}}",
+  "type": "utilities",
+  "splitBetween": 1
+}
+
+###
+
+### Update Bill - No Token (401)
+PUT {{baseUrl}}/api/bills/{{billId}}
+Content-Type: application/json
+
+{
+  "name": "Updated Bill",
+  "amount": 100,
+  "dueDate": 1,
+  "account": "{{testAccountId}}",
+  "type": "utilities"
+}
+
+###
+
+### Update Bill - Invalid Token (401)
+PUT {{baseUrl}}/api/bills/{{billId}}
+Authorization: Bearer invalid.token.here
+Content-Type: application/json
+
+{
+  "name": "Updated Bill",
+  "amount": 100,
+  "dueDate": 1,
+  "account": "{{testAccountId}}",
+  "type": "utilities"
+}
+
+###
+
+### Update Bill - Invalid Bill ID (400)
+PUT {{baseUrl}}/api/bills/invalid-id
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Updated Bill",
+  "amount": 100,
+  "dueDate": 1,
+  "account": "{{testAccountId}}",
+  "type": "utilities"
+}
+
+###
+
+### Update Bill - Non-existent Bill ID (404)
+PUT {{baseUrl}}/api/bills/507f1f77bcf86cd799439011
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Updated Bill",
+  "amount": 100,
+  "dueDate": 1,
+  "account": "{{testAccountId}}",
+  "type": "utilities"
+}
+
+###
+
+### Update Bill - Missing Name (400)
+PUT {{baseUrl}}/api/bills/{{billId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "amount": 100,
+  "dueDate": 1,
+  "account": "{{testAccountId}}",
+  "type": "utilities"
+}
+
+###
+
+### Update Bill - Empty Name (400)
+PUT {{baseUrl}}/api/bills/{{billId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "",
+  "amount": 100,
+  "dueDate": 1,
+  "account": "{{testAccountId}}",
+  "type": "utilities"
+}
+
+###
+
+### Update Bill - Negative Amount (400)
+PUT {{baseUrl}}/api/bills/{{billId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Test Bill",
+  "amount": -50,
+  "dueDate": 1,
+  "account": "{{testAccountId}}",
+  "type": "utilities"
+}
+
+###
+
+### Update Bill - Due Date Out of Range (400)
+PUT {{baseUrl}}/api/bills/{{billId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Test Bill",
+  "amount": 100,
+  "dueDate": 35,
+  "account": "{{testAccountId}}",
+  "type": "utilities"
+}
+
+###
+
+### Update Bill - Invalid Type (400)
+PUT {{baseUrl}}/api/bills/{{billId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Test Bill",
+  "amount": 100,
+  "dueDate": 1,
+  "account": "{{testAccountId}}",
+  "type": "invalid"
+}
+
+###
+
+### ===========================================
+### REORDER BILLS
+### ===========================================
+
+### Setup - Create Bill 1 for Reordering
+# @name reorderBill1
+POST {{baseUrl}}/api/bills
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Reorder Test 1",
+  "amount": 100,
+  "dueDate": 1,
+  "account": "{{testAccountId}}",
+  "type": "utilities"
+}
+
+###
+
+@reorderBillId1 = {{reorderBill1.response.body._id}}
+
+### Setup - Create Bill 2 for Reordering
+# @name reorderBill2
+POST {{baseUrl}}/api/bills
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Reorder Test 2",
+  "amount": 200,
+  "dueDate": 15,
+  "account": "{{testAccountId}}",
+  "type": "housing"
+}
+
+###
+
+@reorderBillId2 = {{reorderBill2.response.body._id}}
+
+### Setup - Create Bill 3 for Reordering
+# @name reorderBill3
+POST {{baseUrl}}/api/bills
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Reorder Test 3",
+  "amount": 300,
+  "dueDate": 25,
+  "account": "{{testAccountId}}",
+  "type": "entertainment"
+}
+
+###
+
+@reorderBillId3 = {{reorderBill3.response.body._id}}
+
+### Reorder Bills - Success (200)
+PUT {{baseUrl}}/api/bills/reorder
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+[
+  "{{reorderBillId3}}",
+  "{{reorderBillId1}}",
+  "{{reorderBillId2}}"
+]
+
+###
+
+### Reorder Bills - No Token (401)
+PUT {{baseUrl}}/api/bills/reorder
+Content-Type: application/json
+
+[
+  "{{reorderBillId1}}",
+  "{{reorderBillId2}}"
+]
+
+###
+
+### Reorder Bills - Invalid Token (401)
+PUT {{baseUrl}}/api/bills/reorder
+Authorization: Bearer invalid.token.here
+Content-Type: application/json
+
+[
+  "{{reorderBillId1}}",
+  "{{reorderBillId2}}"
+]
+
+###
+
+### Reorder Bills - Empty Array (400)
+PUT {{baseUrl}}/api/bills/reorder
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+[]
+
+###
+
+### Reorder Bills - Invalid ID Format (400)
+PUT {{baseUrl}}/api/bills/reorder
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+[
+  "invalid-id",
+  "{{reorderBillId1}}"
+]
+
+###
+
+### Reorder Bills - Not an Array (400)
+PUT {{baseUrl}}/api/bills/reorder
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "ids": ["{{reorderBillId1}}"]
+}
+
+###
+
+### ===========================================
+### DELETE BILL
+### ===========================================
+
+### Delete Bill - Success (200 or 204)
+DELETE {{baseUrl}}/api/bills/{{billId}}
+Authorization: Bearer {{accessToken}}
+
+###
+
+### Delete Bill - No Token (401)
+DELETE {{baseUrl}}/api/bills/{{billId}}
+
+###
+
+### Delete Bill - Invalid Token (401)
+DELETE {{baseUrl}}/api/bills/{{billId}}
+Authorization: Bearer invalid.token.here
+
+###
+
+### Delete Bill - Invalid Bill ID (400)
+DELETE {{baseUrl}}/api/bills/invalid-id
+Authorization: Bearer {{accessToken}}
+
+###
+
+### Delete Bill - Non-existent Bill ID (404)
+DELETE {{baseUrl}}/api/bills/507f1f77bcf86cd799439011
+Authorization: Bearer {{accessToken}}
+
+###
