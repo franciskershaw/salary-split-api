@@ -6,6 +6,7 @@ import { errorHandler } from "./core/middleware/error.middleware";
 import authRoutes from "./features/auth/routes/_auth.routes";
 import userRoutes from "./features/users/routes/_user.routes";
 import accountRoutes from "./features/accounts/routes/_account.routes";
+import billRoutes from "./features/bills/routes/_bill.routes";
 
 const isNetworkDevelopmentMode =
   process.env.NODE_ENV === "development" && process.argv.includes("--host");
@@ -36,6 +37,7 @@ export const createApp = () => {
   app.route("/api/auth", authRoutes);
   app.route("/api/users", userRoutes);
   app.route("/api/accounts", accountRoutes);
+  app.route("/api/bills", billRoutes);
 
   // Welcome / Health check route
   app.get("/", (c) =>

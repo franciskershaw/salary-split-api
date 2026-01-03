@@ -1,21 +1,21 @@
 import { Hono } from "hono";
-// import { authenticate } from "../../../core/middleware/auth.middleware";
+import { authenticate } from "../../../core/middleware/auth.middleware";
 // import validateObjectId from "../../../core/middleware/validateObjectId.middleware";
-// import billController from "../controllers/_bill.controller";
-// import { validate } from "../../../core/utils/validate";
-// import { billSchema } from "../validation/bill.validation";
+import billController from "../controllers/_bill.controller";
+import { validate } from "../../../core/utils/validate";
+import { billSchema } from "../validation/bill.validation";
 // import { reorderBillsSchema } from "../validation/reorderBills.validation";
 
 const billRoutes = new Hono();
 
 // billRoutes.get("/", authenticate, billController.getBills);
 
-// billRoutes.post(
-//   "/",
-//   authenticate,
-//   validate("json", billSchema),
-//   billController.addBill
-// );
+billRoutes.post(
+  "/",
+  authenticate,
+  validate("json", billSchema),
+  billController.addBill
+);
 
 // billRoutes.put(
 //   "/reorder",
