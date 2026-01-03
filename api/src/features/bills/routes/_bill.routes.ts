@@ -32,11 +32,11 @@ billRoutes.put(
   billController.editBill
 );
 
-// billRoutes.delete(
-//   "/:billId",
-//   authenticate,
-//   validateObjectId("billId"),
-//   billController.deleteBill
-// );
+billRoutes.delete(
+  "/:billId",
+  authenticate,
+  validateObjectId("billId"),
+  billController.deleteBill
+);
 
 export default billRoutes;
