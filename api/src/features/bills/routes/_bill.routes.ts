@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { authenticate } from "../../../core/middleware/auth.middleware";
-// import validateObjectId from "../../../core/middleware/validateObjectId.middleware";
+import validateObjectId from "../../../core/middleware/validateObjectId.middleware";
 import billController from "../controllers/_bill.controller";
 import { validate } from "../../../core/utils/validate";
 import { billSchema } from "../validation/bill.validation";
@@ -24,13 +24,13 @@ billRoutes.post(
 //   billController.reorderBills
 // );
 
-// billRoutes.put(
-//   "/:billId",
-//   authenticate,
-//   validateObjectId("billId"),
-//   validate("json", billSchema),
-//   billController.editBill
-// );
+billRoutes.put(
+  "/:billId",
+  authenticate,
+  validateObjectId("billId"),
+  validate("json", billSchema),
+  billController.editBill
+);
 
 // billRoutes.delete(
 //   "/:billId",
