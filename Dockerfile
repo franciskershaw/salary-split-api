@@ -41,4 +41,4 @@ COPY --from=builder /usr/src/app/dist ./dist
 EXPOSE 5300
 
 # Start the Node.js application
-CMD ["node", "dist/server.js"]
+CMD ["node", "dist/index.js"]

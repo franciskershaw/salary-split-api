@@ -1,20 +1,22 @@
-import { Request, Response, NextFunction } from "express";
-import User, { IUser } from "../model/user.model";
+import { Context } from "hono";
+import User from "../model/user.model";
 import { NotFoundError } from "../../../core/utils/errors";
 import { sendTokensAndUser } from "../../auth/utils/auth.helper";
 
-const getUserInfo = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const user = await User.findById((req.user as IUser)._id).lean();
+const getUserInfo = async (c: Context) => {
+  const userId = c.get("user")?._id;
 
-    if (!user) {
-      throw new NotFoundError("User not found");
-    }
-
-    sendTokensAndUser(res, user as IUser);
-  } catch (err) {
-    next(err);
+  if (!userId) {
+    throw new NotFoundError("User not found");
   }
+
+  const user = await User.findById(userId).lean();
+
+  if (!user) {
+    throw new NotFoundError("User not found");
+  }
+
+  return sendTokensAndUser(c, user, 200);
 };
 
 export default getUserInfo;

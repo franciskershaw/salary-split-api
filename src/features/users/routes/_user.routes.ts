@@ -1,48 +1,64 @@
-import express from "express";
-import asyncHandler from "express-async-handler";
-import { authenticateToken } from "../../auth/middleware/auth.middleware";
-import * as userController from "../controllers/_user.controller";
+import { Hono } from "hono";
+import { authenticate } from "../../../core/middleware/auth.middleware";
+import userController from "../controllers/_user.controller";
+import { validate } from "../../../core/utils/validate";
+import { updateUserSchema } from "../validation/updateUser.user.validation";
+import { updateAccountFiltersSchema } from "../validation/accountFilters.user.validation";
+import { updateBillFiltersSchema } from "../validation/billFilters.user.validation";
+import { updateSalarySchema } from "../validation/salary.user.validation";
+import { updateThemeSchema } from "../validation/updateTheme.user.validation";
 
-const router = express.Router();
+const userRoutes = new Hono();
 
-router.get("/", authenticateToken, asyncHandler(userController.getUser));
+userRoutes.get("/", authenticate, userController.getUserInfo);
 
-router.put("/", authenticateToken, asyncHandler(userController.updateUser));
+userRoutes.put(
+  "/",
+  authenticate,
+  validate("json", updateUserSchema),
+  userController.updateUser
+);
 
-router.patch(
+userRoutes.patch(
   "/salary",
-  authenticateToken,
-  asyncHandler(userController.updateSalary)
+  authenticate,
+  validate("json", updateSalarySchema),
+  userController.updateSalary
 );
 
-router.put(
+userRoutes.put(
   "/account-filters",
-  authenticateToken,
-  asyncHandler(userController.updateFilters)
+  authenticate,
+  validate("json", updateAccountFiltersSchema),
+  userController.updateFilters
 );
 
-router.put(
+userRoutes.put(
   "/bill-filters",
-  authenticateToken,
-  asyncHandler(userController.updateFilters)
+  authenticate,
+  validate("json", updateBillFiltersSchema),
+  userController.updateFilters
 );
 
-router.put(
+userRoutes.put(
   "/expense-filters",
-  authenticateToken,
-  asyncHandler(userController.updateFilters)
+  authenticate,
+  validate("json", updateBillFiltersSchema),
+  userController.updateFilters
 );
 
-router.put(
+userRoutes.put(
   "/savings-filters",
-  authenticateToken,
-  asyncHandler(userController.updateFilters)
+  authenticate,
+  validate("json", updateBillFiltersSchema),
+  userController.updateFilters
 );
 
-router.put(
+userRoutes.put(
   "/theme",
-  authenticateToken,
-  asyncHandler(userController.updateTheme)
+  authenticate,
+  validate("json", updateThemeSchema),
+  userController.updateTheme
 );
 
-export default router;
+export default userRoutes;

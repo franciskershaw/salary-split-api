@@ -1,35 +1,30 @@
-import express from "express";
-import passport from "passport";
-import authController from "../contollers/_auth.controller";
-import { refreshTokens } from "../middleware/auth.middleware";
-import { GOOGLE_PROVIDER } from "../../../core/utils/constants";
+import { Hono } from "hono";
+import { validate } from "../../../core/utils/validate";
+import authController from "../controllers/_auth.controller";
+import { localRegisterSchema } from "../validation/localRegister.auth.validation";
+import { localLoginSchema } from "../validation/localLogin.auth.validation";
+import { googleAuth } from "../controllers/OAuth/google/googleAuth.controller";
+import { googleCallback } from "../controllers/OAuth/google/googleCallback.controller";
 
-const router = express.Router();
+const authRoutes = new Hono();
 
-// Local login route
-router.post("/login", authController.localLogin);
-router.post("/register", authController.localRegister);
-
-// Google OAuth route
-router.get(
-  "/google",
-  passport.authenticate(GOOGLE_PROVIDER, { scope: ["profile", "email"] })
+authRoutes.post(
+  "/register",
+  validate("json", localRegisterSchema),
+  authController.localRegister
 );
 
-// Google OAuth callback route
-router.get(
-  "/google/callback",
-  passport.authenticate(GOOGLE_PROVIDER, {
-    session: false,
-    failureRedirect: process.env.CORS_ORIGIN,
-  }),
-  authController.googleCallback
+authRoutes.post(
+  "/login",
+  validate("json", localLoginSchema),
+  authController.localLogin
 );
 
-// Logout route
-router.post("/logout", authController.logout);
+authRoutes.post("/logout", authController.logout);
 
-// Refresh token route
-router.get("/refresh-token", refreshTokens);
+authRoutes.get("/google", googleAuth);
+authRoutes.get("/google/callback", googleCallback);
 
-export default router;
+authRoutes.get("/refresh-token", authController.refreshTokens);
+
+export default authRoutes;

@@ -1,0 +1,657 @@
+### ===========================================
+### EXPENSE TESTS
+### ===========================================
+
+@baseUrl = http://localhost:5300
+@email = test@example.com
+@password = TestPassword123!
+
+### ===========================================
+### SETUP - LOGIN TO GET TOKEN & CREATE ACCOUNT
+### ===========================================
+
+### Login - Get Access Token
+# @name login
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{email}}",
+  "password": "{{password}}"
+}
+
+###
+
+@accessToken = {{login.response.body.accessToken}}
+
+### Setup - Create Account for Expenses
+# @name setupAccount
+POST {{baseUrl}}/api/accounts
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Expenses Test Account"
+}
+
+###
+
+@testAccountId = {{setupAccount.response.body._id}}
+
+### ===========================================
+### GET ALL EXPENSES
+### ===========================================
+
+### Get All Expenses - Success (200)
+GET {{baseUrl}}/api/expenses
+Authorization: Bearer {{accessToken}}
+
+###
+
+### Get All Expenses - No Token (401)
+GET {{baseUrl}}/api/expenses
+
+###
+
+### Get All Expenses - Invalid Token (401)
+GET {{baseUrl}}/api/expenses
+Authorization: Bearer invalid.token.here
+
+###
+
+### ===========================================
+### ADD EXPENSE
+### ===========================================
+
+### Add Expense - Success (201)
+# @name addExpense
+POST {{baseUrl}}/api/expenses
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Groceries",
+  "amount": 150.50,
+  "dueDate": 1,
+  "account": "{{testAccountId}}",
+  "type": "food"
+}
+
+###
+
+@expenseId = {{addExpense.response.body._id}}
+
+### Add Expense - Different Type (201)
+POST {{baseUrl}}/api/expenses
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Gas",
+  "amount": 45,
+  "dueDate": 15,
+  "account": "{{testAccountId}}",
+  "type": "transport"
+}
+
+###
+
+### Add Expense - No Token (401)
+POST {{baseUrl}}/api/expenses
+Content-Type: application/json
+
+{
+  "name": "Test Expense",
+  "amount": 100,
+  "dueDate": 1,
+  "account": "{{testAccountId}}",
+  "type": "food"
+}
+
+###
+
+### Add Expense - Invalid Token (401)
+POST {{baseUrl}}/api/expenses
+Authorization: Bearer invalid.token.here
+Content-Type: application/json
+
+{
+  "name": "Test Expense",
+  "amount": 100,
+  "dueDate": 1,
+  "account": "{{testAccountId}}",
+  "type": "food"
+}
+
+###
+
+### Add Expense - Missing Name (400)
+POST {{baseUrl}}/api/expenses
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "amount": 100,
+  "dueDate": 1,
+  "account": "{{testAccountId}}",
+  "type": "food"
+}
+
+###
+
+### Add Expense - Empty Name (400)
+POST {{baseUrl}}/api/expenses
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "",
+  "amount": 100,
+  "dueDate": 1,
+  "account": "{{testAccountId}}",
+  "type": "food"
+}
+
+###
+
+### Add Expense - Missing Amount (400)
+POST {{baseUrl}}/api/expenses
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Test Expense",
+  "dueDate": 1,
+  "account": "{{testAccountId}}",
+  "type": "food"
+}
+
+###
+
+### Add Expense - Negative Amount (400)
+POST {{baseUrl}}/api/expenses
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Test Expense",
+  "amount": -100,
+  "dueDate": 1,
+  "account": "{{testAccountId}}",
+  "type": "food"
+}
+
+###
+
+### Add Expense - Invalid Amount Type (400)
+POST {{baseUrl}}/api/expenses
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Test Expense",
+  "amount": "100",
+  "dueDate": 1,
+  "account": "{{testAccountId}}",
+  "type": "food"
+}
+
+###
+
+### Add Expense - Missing Due Date (400)
+POST {{baseUrl}}/api/expenses
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Test Expense",
+  "amount": 100,
+  "account": "{{testAccountId}}",
+  "type": "food"
+}
+
+###
+
+### Add Expense - Due Date Too Low (400)
+POST {{baseUrl}}/api/expenses
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Test Expense",
+  "amount": 100,
+  "dueDate": 0,
+  "account": "{{testAccountId}}",
+  "type": "food"
+}
+
+###
+
+### Add Expense - Due Date Too High (400)
+POST {{baseUrl}}/api/expenses
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Test Expense",
+  "amount": 100,
+  "dueDate": 32,
+  "account": "{{testAccountId}}",
+  "type": "food"
+}
+
+###
+
+### Add Expense - Due Date Not Integer (400)
+POST {{baseUrl}}/api/expenses
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Test Expense",
+  "amount": 100,
+  "dueDate": 15.5,
+  "account": "{{testAccountId}}",
+  "type": "food"
+}
+
+###
+
+### Add Expense - Missing Account (400)
+POST {{baseUrl}}/api/expenses
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Test Expense",
+  "amount": 100,
+  "dueDate": 1,
+  "type": "food"
+}
+
+###
+
+### Add Expense - Empty Account (400)
+POST {{baseUrl}}/api/expenses
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Test Expense",
+  "amount": 100,
+  "dueDate": 1,
+  "account": "",
+  "type": "food"
+}
+
+###
+
+### Add Expense - Invalid Account ID Format (400)
+POST {{baseUrl}}/api/expenses
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Test Expense",
+  "amount": 100,
+  "dueDate": 1,
+  "account": "invalid-id",
+  "type": "food"
+}
+
+###
+
+### Add Expense - Missing Type (400)
+POST {{baseUrl}}/api/expenses
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Test Expense",
+  "amount": 100,
+  "dueDate": 1,
+  "account": "{{testAccountId}}"
+}
+
+###
+
+### Add Expense - Invalid Type (400)
+POST {{baseUrl}}/api/expenses
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Test Expense",
+  "amount": 100,
+  "dueDate": 1,
+  "account": "{{testAccountId}}",
+  "type": "invalid-type"
+}
+
+###
+
+### ===========================================
+### UPDATE EXPENSE
+### ===========================================
+
+### Update Expense - Success (200)
+PUT {{baseUrl}}/api/expenses/{{expenseId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Updated Groceries",
+  "amount": 175.75,
+  "dueDate": 5,
+  "account": "{{testAccountId}}",
+  "type": "food"
+}
+
+###
+
+### Update Expense - Change Type (200)
+PUT {{baseUrl}}/api/expenses/{{expenseId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Updated Expense",
+  "amount": 200,
+  "dueDate": 15,
+  "account": "{{testAccountId}}",
+  "type": "personal"
+}
+
+###
+
+### Update Expense - No Token (401)
+PUT {{baseUrl}}/api/expenses/{{expenseId}}
+Content-Type: application/json
+
+{
+  "name": "Updated Expense",
+  "amount": 100,
+  "dueDate": 1,
+  "account": "{{testAccountId}}",
+  "type": "food"
+}
+
+###
+
+### Update Expense - Invalid Token (401)
+PUT {{baseUrl}}/api/expenses/{{expenseId}}
+Authorization: Bearer invalid.token.here
+Content-Type: application/json
+
+{
+  "name": "Updated Expense",
+  "amount": 100,
+  "dueDate": 1,
+  "account": "{{testAccountId}}",
+  "type": "food"
+}
+
+###
+
+### Update Expense - Invalid Expense ID (400)
+PUT {{baseUrl}}/api/expenses/invalid-id
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Updated Expense",
+  "amount": 100,
+  "dueDate": 1,
+  "account": "{{testAccountId}}",
+  "type": "food"
+}
+
+###
+
+### Update Expense - Non-existent Expense ID (404)
+PUT {{baseUrl}}/api/expenses/507f1f77bcf86cd799439011
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Updated Expense",
+  "amount": 100,
+  "dueDate": 1,
+  "account": "{{testAccountId}}",
+  "type": "food"
+}
+
+###
+
+### Update Expense - Missing Name (400)
+PUT {{baseUrl}}/api/expenses/{{expenseId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "amount": 100,
+  "dueDate": 1,
+  "account": "{{testAccountId}}",
+  "type": "food"
+}
+
+###
+
+### Update Expense - Empty Name (400)
+PUT {{baseUrl}}/api/expenses/{{expenseId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "",
+  "amount": 100,
+  "dueDate": 1,
+  "account": "{{testAccountId}}",
+  "type": "food"
+}
+
+###
+
+### Update Expense - Negative Amount (400)
+PUT {{baseUrl}}/api/expenses/{{expenseId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Test Expense",
+  "amount": -50,
+  "dueDate": 1,
+  "account": "{{testAccountId}}",
+  "type": "food"
+}
+
+###
+
+### Update Expense - Due Date Out of Range (400)
+PUT {{baseUrl}}/api/expenses/{{expenseId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Test Expense",
+  "amount": 100,
+  "dueDate": 35,
+  "account": "{{testAccountId}}",
+  "type": "food"
+}
+
+###
+
+### Update Expense - Invalid Type (400)
+PUT {{baseUrl}}/api/expenses/{{expenseId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Test Expense",
+  "amount": 100,
+  "dueDate": 1,
+  "account": "{{testAccountId}}",
+  "type": "invalid"
+}
+
+###
+
+### ===========================================
+### REORDER EXPENSES
+### ===========================================
+
+### Setup - Create Expense 1 for Reordering
+# @name reorderExpense1
+POST {{baseUrl}}/api/expenses
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Reorder Test 1",
+  "amount": 100,
+  "dueDate": 1,
+  "account": "{{testAccountId}}",
+  "type": "food"
+}
+
+###
+
+@reorderExpenseId1 = {{reorderExpense1.response.body._id}}
+
+### Setup - Create Expense 2 for Reordering
+# @name reorderExpense2
+POST {{baseUrl}}/api/expenses
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Reorder Test 2",
+  "amount": 200,
+  "dueDate": 15,
+  "account": "{{testAccountId}}",
+  "type": "transport"
+}
+
+###
+
+@reorderExpenseId2 = {{reorderExpense2.response.body._id}}
+
+### Setup - Create Expense 3 for Reordering
+# @name reorderExpense3
+POST {{baseUrl}}/api/expenses
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Reorder Test 3",
+  "amount": 300,
+  "dueDate": 25,
+  "account": "{{testAccountId}}",
+  "type": "personal"
+}
+
+###
+
+@reorderExpenseId3 = {{reorderExpense3.response.body._id}}
+
+### Reorder Expenses - Success (200)
+PUT {{baseUrl}}/api/expenses/reorder
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+[
+  "{{reorderExpenseId3}}",
+  "{{reorderExpenseId1}}",
+  "{{reorderExpenseId2}}"
+]
+
+###
+
+### Reorder Expenses - No Token (401)
+PUT {{baseUrl}}/api/expenses/reorder
+Content-Type: application/json
+
+[
+  "{{reorderExpenseId1}}",
+  "{{reorderExpenseId2}}"
+]
+
+###
+
+### Reorder Expenses - Invalid Token (401)
+PUT {{baseUrl}}/api/expenses/reorder
+Authorization: Bearer invalid.token.here
+Content-Type: application/json
+
+[
+  "{{reorderExpenseId1}}",
+  "{{reorderExpenseId2}}"
+]
+
+###
+
+### Reorder Expenses - Empty Array (400)
+PUT {{baseUrl}}/api/expenses/reorder
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+[]
+
+###
+
+### Reorder Expenses - Invalid ID Format (400)
+PUT {{baseUrl}}/api/expenses/reorder
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+[
+  "invalid-id",
+  "{{reorderExpenseId1}}"
+]
+
+###
+
+### Reorder Expenses - Not an Array (400)
+PUT {{baseUrl}}/api/expenses/reorder
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "ids": ["{{reorderExpenseId1}}"]
+}
+
+###
+
+### ===========================================
+### DELETE EXPENSE
+### ===========================================
+
+### Delete Expense - Success (200 or 204)
+DELETE {{baseUrl}}/api/expenses/{{expenseId}}
+Authorization: Bearer {{accessToken}}
+
+###
+
+### Delete Expense - No Token (401)
+DELETE {{baseUrl}}/api/expenses/{{expenseId}}
+
+###
+
+### Delete Expense - Invalid Token (401)
+DELETE {{baseUrl}}/api/expenses/{{expenseId}}
+Authorization: Bearer invalid.token.here
+
+###
+
+### Delete Expense - Invalid Expense ID (400)
+DELETE {{baseUrl}}/api/expenses/invalid-id
+Authorization: Bearer {{accessToken}}
+
+###
+
+### Delete Expense - Non-existent Expense ID (404)
+DELETE {{baseUrl}}/api/expenses/507f1f77bcf86cd799439011
+Authorization: Bearer {{accessToken}}
+
+###

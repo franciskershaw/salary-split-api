@@ -1,0 +1,269 @@
+### ===========================================
+### UPDATE AMOUNT TESTS
+### ===========================================
+
+@baseUrl = http://localhost:5300
+@email = test@example.com
+@password = TestPassword123!
+
+### ===========================================
+### SETUP - LOGIN TO GET TOKEN & CREATE TEST ITEMS
+### ===========================================
+
+### Login - Get Access Token
+# @name login
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{email}}",
+  "password": "{{password}}"
+}
+
+###
+
+@accessToken = {{login.response.body.accessToken}}
+
+### Setup - Create Account for Testing
+# @name setupAccount
+POST {{baseUrl}}/api/accounts
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Amount Test Account"
+}
+
+###
+
+@testAccountId = {{setupAccount.response.body._id}}
+
+### Setup - Create Bill for Testing
+# @name setupBill
+POST {{baseUrl}}/api/bills
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Test Bill",
+  "amount": 100,
+  "dueDate": 1,
+  "account": "{{testAccountId}}",
+  "type": "utilities"
+}
+
+###
+
+@testBillId = {{setupBill.response.body._id}}
+
+### Setup - Create Expense for Testing
+# @name setupExpense
+POST {{baseUrl}}/api/expenses
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Test Expense",
+  "amount": 50,
+  "dueDate": 15,
+  "account": "{{testAccountId}}",
+  "type": "food"
+}
+
+###
+
+@testExpenseId = {{setupExpense.response.body._id}}
+
+### Setup - Create Savings for Testing
+# @name setupSavings
+POST {{baseUrl}}/api/savings
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Test Savings",
+  "amount": 200,
+  "dueDate": 1,
+  "account": "{{testAccountId}}"
+}
+
+###
+
+@testSavingsId = {{setupSavings.response.body._id}}
+
+### ===========================================
+### UPDATE AMOUNT - ACCOUNTS
+### ===========================================
+
+### Update Account Amount - Success (200)
+PATCH {{baseUrl}}/api/update-amount/accounts/{{testAccountId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "amount": 5000
+}
+
+###
+
+### ===========================================
+### UPDATE AMOUNT - BILLS
+### ===========================================
+
+### Update Bill Amount - Success (200)
+PATCH {{baseUrl}}/api/update-amount/bills/{{testBillId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "amount": 150
+}
+
+###
+
+### ===========================================
+### UPDATE AMOUNT - EXPENSES
+### ===========================================
+
+### Update Expense Amount - Success (200)
+PATCH {{baseUrl}}/api/update-amount/expenses/{{testExpenseId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "amount": 75
+}
+
+###
+
+### ===========================================
+### UPDATE AMOUNT - SAVINGS
+### ===========================================
+
+### Update Savings Amount - Success (200)
+PATCH {{baseUrl}}/api/update-amount/savings/{{testSavingsId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "amount": 300
+}
+
+###
+
+### ===========================================
+### AUTHENTICATION TESTS
+### ===========================================
+
+### Update Amount - No Token (401)
+PATCH {{baseUrl}}/api/update-amount/accounts/{{testAccountId}}
+Content-Type: application/json
+
+{
+  "amount": 1000
+}
+
+###
+
+### Update Amount - Invalid Token (401)
+PATCH {{baseUrl}}/api/update-amount/accounts/{{testAccountId}}
+Authorization: Bearer invalid.token.here
+Content-Type: application/json
+
+{
+  "amount": 1000
+}
+
+###
+
+### ===========================================
+### VALIDATION TESTS
+### ===========================================
+
+### Update Amount - Missing Amount (400)
+PATCH {{baseUrl}}/api/update-amount/accounts/{{testAccountId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{}
+
+###
+
+### Update Amount - Invalid Amount Type (400)
+PATCH {{baseUrl}}/api/update-amount/accounts/{{testAccountId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "amount": "not-a-number"
+}
+
+###
+
+### Update Amount - Negative Amount (200 - Allowed)
+PATCH {{baseUrl}}/api/update-amount/accounts/{{testAccountId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "amount": -100
+}
+
+###
+
+### ===========================================
+### INVALID FEATURE TESTS
+### ===========================================
+
+### Update Amount - Invalid Feature (400)
+PATCH {{baseUrl}}/api/update-amount/invalid-feature/{{testAccountId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "amount": 1000
+}
+
+###
+
+### ===========================================
+### INVALID ITEM ID TESTS
+### ===========================================
+
+### Update Amount - Invalid Item ID Format (400)
+PATCH {{baseUrl}}/api/update-amount/accounts/invalid-id
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "amount": 1000
+}
+
+###
+
+### Update Amount - Non-existent Item ID (404)
+PATCH {{baseUrl}}/api/update-amount/accounts/507f1f77bcf86cd799439011
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "amount": 1000
+}
+
+###
+
+### ===========================================
+### STRICT VALIDATION TEST
+### ===========================================
+
+### Update Amount - Unknown Field (400 - with strict validation)
+PATCH {{baseUrl}}/api/update-amount/accounts/{{testAccountId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "amount": 1000,
+  "extraField": "should be rejected"
+}
+
+###

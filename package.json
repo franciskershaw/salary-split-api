@@ -1,62 +1,31 @@
 {
-  "name": "salary-split-api-v2",
-  "version": "2.0.0",
-  "description": "An application to help me organise my bills and savings at the start of each month, written in Node and React.",
-  "main": "dist/server.js",
+  "name": "api",
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
-    "dev:local": "MONGO_URI=mongodb://localhost:27017/salary-split-api-dev ts-node-dev --respawn --transpile-only src/server.ts",
-    "dev:network": "ts-node-dev --respawn --transpile-only src/server.ts --host",
-    "dev:docker": "docker-compose up --build",
+    "dev": "tsx watch src/index.ts",
     "build": "tsc",
-    "start": "node dist/server.js",
+    "start": "node dist/index.js",
     "docker:build": "docker build -t salary-split-api .",
-    "docker:prod": "docker run -p 5300:5300 salary-split-api"
+    "docker:prod": "docker run -p 5300:5300 salary-split-api",
+    "lint": "eslint src --ext .ts",
+    "lint:fix": "eslint src --ext .ts --fix"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/franciskershaw/salary-split-api.git"
-  },
-  "author": "Francis Kershaw",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/franciskershaw/salary-split-api/issues"
-  },
-  "homepage": "https://github.com/franciskershaw/salary-split-api#readme",
   "dependencies": {
-    "bcryptjs": "^3.0.2",
-    "colors": "^1.4.0",
-    "connect-mongo": "^5.1.0",
-    "cookie-parser": "^1.4.7",
-    "cors": "^2.8.5",
-    "dayjs": "^1.11.13",
-    "dotenv": "^16.5.0",
-    "express": "^5.1.0",
-    "express-async-handler": "^1.2.0",
-    "helmet": "^8.1.0",
-    "joi": "^17.13.3",
-    "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.15.0",
-    "morgan": "^1.10.0",
-    "passport": "^0.7.0",
-    "passport-google-oauth20": "^2.0.0",
-    "passport-jwt": "^4.0.1",
-    "passport-local": "^1.0.0",
-    "uuidv4": "^6.2.13"
+    "@hono/node-server": "^1.19.6",
+    "@hono/zod-validator": "^0.7.6",
+    "arctic": "^3.7.0",
+    "bcryptjs": "^3.0.3",
+    "dayjs": "^1.11.19",
+    "dotenv": "^17.2.3",
+    "hono": "^4.11.1",
+    "mongoose": "^9.0.2",
+    "zod": "^4.2.1"
   },
   "devDependencies": {
-    "@types/bcryptjs": "^2.4.6",
-    "@types/cookie-parser": "^1.4.8",
-    "@types/cors": "^2.8.18",
-    "@types/express": "^5.0.2",
-    "@types/morgan": "^1.9.9",
-    "@types/node": "^22.15.21",
-    "@types/passport": "^1.0.17",
-    "@types/passport-google-oauth20": "^2.0.16",
-    "@types/passport-jwt": "^4.0.1",
-    "@types/passport-local": "^1.0.38",
-    "nodemon": "^3.1.10",
-    "ts-node-dev": "^2.0.0",
+    "@types/node": "^20.11.17",
+    "@typescript-eslint/eslint-plugin": "^8.50.0",
+    "@typescript-eslint/parser": "^8.50.0",
+    "eslint": "^9.39.2",
+    "tsx": "^4.7.1",
     "typescript": "^5.8.3"
   }
 }

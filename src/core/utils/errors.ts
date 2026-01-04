@@ -1,64 +1,46 @@
-export class BadRequestError extends Error {
-  statusCode: number;
+import { HTTPException } from "hono/http-exception";
 
+export class BadRequestError extends HTTPException {
   constructor(message: string) {
-    super(message);
-    this.statusCode = 400;
+    super(400, { message: message || "Bad Request" });
   }
 }
 
-export class UnauthorizedError extends Error {
-  statusCode: number;
-  errorCode?: string | number;
+export class UnauthorizedError extends HTTPException {
+  errorCode?: string;
 
-  constructor(message: string, errorCode?: string | number) {
-    super(message);
-    this.statusCode = 401;
+  constructor(message: string, errorCode?: string) {
+    super(401, { message });
     this.errorCode = errorCode;
   }
 }
 
-export class NotFoundError extends Error {
-  statusCode: number;
-
+export class ForbiddenError extends HTTPException {
   constructor(message: string) {
-    super(message);
-    this.statusCode = 404;
+    super(403, { message: message || "Forbidden" });
   }
 }
 
-export class ForbiddenError extends Error {
-  statusCode: number;
-
+export class NotFoundError extends HTTPException {
   constructor(message: string) {
-    super(message);
-    this.statusCode = 403;
+    super(404, { message: message || "Not Found" });
   }
 }
 
-export class ConflictError extends Error {
-  statusCode: number;
-
+export class ConflictError extends HTTPException {
   constructor(message: string) {
-    super(message);
-    this.statusCode = 409;
+    super(409, { message: message || "Conflict" });
   }
 }
 
-export class InternalServerError extends Error {
-  statusCode: number;
-
+export class TooManyRequestsError extends HTTPException {
   constructor(message: string) {
-    super(message);
-    this.statusCode = 500;
+    super(429, { message: message || "Too Many Requests" });
   }
 }
 
-export class ServiceUnavailableError extends Error {
-  statusCode: number;
-
+export class InternalServerError extends HTTPException {
   constructor(message: string) {
-    super(message);
-    this.statusCode = 503;
+    super(500, { message: message || "Internal Server Error" });
   }
 }

@@ -1,5 +1,4 @@
 import mongoose, { Document, Model } from "mongoose";
-import { BILL_TYPES } from "../../../core/utils/constants";
 
 export interface ISavings extends Document {
   _id: mongoose.Types.ObjectId;
@@ -36,11 +35,6 @@ const SavingsSchema = new mongoose.Schema(
     account: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Account",
-    },
-    type: {
-      type: String,
-      enum: Object.values(BILL_TYPES),
-      required: true,
     },
     order: {
       type: Number,

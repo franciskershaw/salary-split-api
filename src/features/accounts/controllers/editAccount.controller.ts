@@ -1,31 +1,25 @@
-import { NextFunction, Request, Response } from "express";
-import validateRequest from "../../../core/utils/validate";
+import { Context } from "hono";
 import Account from "../model/account.model";
-import {
-  BadRequestError,
-  ForbiddenError,
-  NotFoundError,
-} from "../../../core/utils/errors";
-import accountSchema from "../validation/account.validation";
+import { BadRequestError, NotFoundError } from "../../../core/utils/errors";
 import User from "../../users/model/user.model";
 import mongoose from "mongoose";
 
-const editAccount = async (req: Request, res: Response, next: NextFunction) => {
+const editAccount = async (c: Context) => {
   let session;
   try {
     session = await mongoose.startSession();
     session.startTransaction();
 
-    const value = validateRequest(req.body, accountSchema);
-    const { accountId } = req.params;
-    const { isDefault, acceptsFunds } = value;
+    const userId = c.get("user")._id;
+    const body = await c.req.json();
+    const accountId = c.req.param("accountId");
 
     // Separate fields to update vs fields to unset
-    const updateFields: any = { ...value };
+    const updateFields: any = { ...body };
     const unsetFields: any = {};
 
     // Check for null values and move them to unset
-    if (value.targetMonthlyAmount === null) {
+    if (body.targetMonthlyAmount === null) {
       delete updateFields.targetMonthlyAmount;
       unsetFields.targetMonthlyAmount = "";
     }
@@ -40,7 +34,7 @@ const editAccount = async (req: Request, res: Response, next: NextFunction) => {
     }
 
     // Use withTransaction to ensure proper session handling
-    const user = await User.findById(req.user).session(session);
+    const user = await User.findById(userId).session(session);
     const account = await Account.findById(accountId).session(session);
 
     if (!user) {
@@ -52,46 +46,61 @@ const editAccount = async (req: Request, res: Response, next: NextFunction) => {
     }
 
     if (account.createdBy.toString() !== user._id.toString()) {
-      throw new ForbiddenError("You are not authorized to edit this account");
+      throw new NotFoundError("Account not found");
     }
 
-    if (isDefault === false && user.defaultAccount?.toString() === accountId) {
+    // Check for name collision if name is being changed
+    if (body.name && body.name !== account.name) {
+      const nameExists = await Account.findOne({
+        createdBy: userId,
+        name: body.name,
+        _id: { $ne: accountId },
+      }).session(session);
+
+      if (nameExists) {
+        throw new BadRequestError("You've used that name already");
+      }
+    }
+
+    if (
+      body.isDefault === false &&
+      user.defaultAccount?.toString() === accountId
+    ) {
       throw new BadRequestError("You cannot remove the default account");
     }
 
-    if (isDefault === true && acceptsFunds === false) {
+    if (body.isDefault === true && body.acceptsFunds === false) {
       throw new BadRequestError("Your default account must accept funds");
     }
 
     let updatedUser = null;
-    if (isDefault) {
+    if (body.isDefault) {
       updatedUser = await User.findByIdAndUpdate(
-        user._id,
-        { defaultAccount: accountId },
+        userId,
+        {
+          defaultAccount: accountId,
+        },
         { session, new: true }
       );
     }
 
     const updatedAccount = await Account.findByIdAndUpdate(
-      accountId, 
+      accountId,
       updateOperation,
       { session, new: true }
     );
 
     await session.commitTransaction();
 
-    res.status(200).json({
-      updatedAccount,
-      ...(updatedUser && { updatedUser }),
-    });
+    return c.json({ updatedAccount, ...(updatedUser && { updatedUser }) });
   } catch (error) {
     if (session) {
       await session.abortTransaction();
     }
-    next(error);
+    throw error;
   } finally {
     if (session) {
-      session.endSession();
+      await session.endSession();
     }
   }
 };

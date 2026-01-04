@@ -1,32 +1,31 @@
-import { Request, Response, NextFunction } from "express";
+import { Context } from "hono";
 import Account from "../model/account.model";
+import mongoose from "mongoose";
 import User from "../../users/model/user.model";
-import validateRequest from "../../../core/utils/validate";
-import accountSchema from "../validation/account.validation";
 import {
+  BadRequestError,
   ConflictError,
   NotFoundError,
-  BadRequestError,
 } from "../../../core/utils/errors";
-import mongoose from "mongoose";
 
-const addAccount = async (req: Request, res: Response, next: NextFunction) => {
+const addAccount = async (c: Context) => {
   let session;
   try {
-    const value = validateRequest(req.body, accountSchema);
-
     session = await mongoose.startSession();
     session.startTransaction();
 
-    const user = await User.findById(req.user).session(session).exec();
+    const userId = c.get("user")._id;
+    const user = await User.findById(userId).session(session).exec();
 
     if (!user) {
       throw new NotFoundError("User not found");
     }
 
+    const body = await c.req.json();
+
     const existingAccounts = await Account.find({
-      createdBy: req.user,
-      name: value.name,
+      createdBy: userId,
+      name: body.name,
     })
       .countDocuments()
       .session(session)
@@ -38,45 +37,45 @@ const addAccount = async (req: Request, res: Response, next: NextFunction) => {
 
     // Check if this is the user's first account
     const isFirstAccount = !user.defaultAccount;
-    if (isFirstAccount && !value.acceptsFunds) {
+    if (isFirstAccount && !body.acceptsFunds) {
       throw new BadRequestError("Your default account must accept funds");
     }
 
     const accountCount = await Account.countDocuments({
-      createdBy: user._id,
+      createdBy: userId,
     })
       .session(session)
       .exec();
 
-    const account = new Account({
-      ...value,
-      order: accountCount,
-      createdBy: user._id,
+    const newAccount = await new Account({
+      ...body,
+      order: accountCount + 1,
+      createdBy: userId,
     });
 
-    // Save account first
-    await account.save({ session });
+    // Save the account first
+    await newAccount.save({ session });
 
-    // Update user's default account if needed
-    if (isFirstAccount || value.isDefault) {
+    // Update the user's default account if needed
+    if (isFirstAccount || body.isDefault) {
       await User.findByIdAndUpdate(
-        user._id,
-        { defaultAccount: account._id },
+        userId,
+        { defaultAccount: newAccount._id },
         { session, new: true }
       );
     }
 
     await session.commitTransaction();
 
-    res.status(201).json(account);
+    return c.json(newAccount, 201);
   } catch (error) {
     if (session) {
       await session.abortTransaction();
     }
-    next(error);
+    throw error;
   } finally {
     if (session) {
-      session.endSession();
+      await session.endSession();
     }
   }
 };

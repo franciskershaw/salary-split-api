@@ -1,7 +1,16 @@
-import addExpense from "./addExpense.controller";
-import getExpenses from "./getExpenses.controller";
-import reorderExpenses from "./reorderExpenses.controller";
-import editExpense from "./editExpense.controller";
-import deleteExpense from "./deleteExpense.controller";
+import Expense from "../model/expense.model";
+import { createAddController } from "../../shared/recurring-items/controllers/add.controller";
+import { createEditController } from "../../shared/recurring-items/controllers/edit.controller";
+import { createDeleteController } from "../../shared/recurring-items/controllers/delete.controller";
+import { createGetController } from "../../shared/recurring-items/controllers/get.controller";
+import { createReorderController } from "../../shared/reorder/reorder.controller";
 
-export { addExpense, getExpenses, reorderExpenses, editExpense, deleteExpense };
+const expenseController = {
+  addExpense: createAddController(Expense),
+  editExpense: createEditController(Expense, "expenseId"),
+  deleteExpense: createDeleteController(Expense, "expenseId"),
+  getExpenses: createGetController(Expense),
+  reorderExpenses: createReorderController(Expense, "expense"),
+};
+
+export default expenseController;

@@ -1,26 +1,42 @@
-import express from "express";
-import asyncHandler from "express-async-handler";
-import { authenticateToken } from "../../auth/middleware/auth.middleware";
-import * as savingsController from "../controllers/_savings.controller";
+import { Hono } from "hono";
+import { authenticate } from "../../../core/middleware/auth.middleware";
+import validateObjectId from "../../../core/middleware/validateObjectId.middleware";
+import savingsController from "../controllers/_savings.controller";
+import { validate } from "../../../core/utils/validate";
+import { savingsSchema } from "../validation/savings.validation";
+import { reorderRecurringItemsSchema } from "../../shared/recurring-items/validation/reorder.validation";
 
-const router = express.Router();
+const savingsRoutes = new Hono();
 
-router.get("/", authenticateToken, asyncHandler(savingsController.getSavings));
-router.post("/", authenticateToken, asyncHandler(savingsController.addSavings));
-router.put(
+savingsRoutes.get("/", authenticate, savingsController.getSavings);
+
+savingsRoutes.post(
+  "/",
+  authenticate,
+  validate("json", savingsSchema),
+  savingsController.addSavings
+);
+
+savingsRoutes.put(
   "/reorder",
-  authenticateToken,
-  asyncHandler(savingsController.reorderSavings)
-);
-router.put(
-  "/:savingsId",
-  authenticateToken,
-  asyncHandler(savingsController.editSavings)
-);
-router.delete(
-  "/:savingsId",
-  authenticateToken,
-  asyncHandler(savingsController.deleteSavings)
+  authenticate,
+  validate("json", reorderRecurringItemsSchema),
+  savingsController.reorderSavings
 );
 
-export default router;
+savingsRoutes.put(
+  "/:savingsId",
+  authenticate,
+  validateObjectId("savingsId"),
+  validate("json", savingsSchema),
+  savingsController.editSavings
+);
+
+savingsRoutes.delete(
+  "/:savingsId",
+  authenticate,
+  validateObjectId("savingsId"),
+  savingsController.deleteSavings
+);
+
+export default savingsRoutes;

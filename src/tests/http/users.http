@@ -1,0 +1,421 @@
+### ===========================================
+### USER TESTS
+### ===========================================
+
+@baseUrl = http://localhost:5300
+@email = test@example.com
+@password = TestPassword123!
+
+### ===========================================
+### SETUP - LOGIN TO GET TOKEN
+### ===========================================
+
+### Login - Get Access Token
+# @name login
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{email}}",
+  "password": "{{password}}"
+}
+
+###
+
+@accessToken = {{login.response.body.accessToken}}
+
+### ===========================================
+### GET USER INFO
+### ===========================================
+
+### Get User Info - Success (200)
+GET {{baseUrl}}/api/users
+Authorization: Bearer {{accessToken}}
+
+###
+
+### Get User Info - No Token (401)
+GET {{baseUrl}}/api/users
+
+###
+
+### Get User Info - Invalid Token (401)
+GET {{baseUrl}}/api/users
+Authorization: Bearer invalid.token.here
+
+###
+
+### Get User Info - Malformed Authorization Header (401)
+GET {{baseUrl}}/api/users
+Authorization: {{accessToken}}
+
+###
+
+### ===========================================
+### UPDATE USER
+### ===========================================
+
+### Update User - Success (200)
+PUT {{baseUrl}}/api/users
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": {
+    "firstName": "Updated",
+    "lastName": "Name"
+  },
+  "takeHomePay": 50000,
+  "defaultCurrency": "GBP"
+}
+
+###
+
+### Update User - No Token (401)
+PUT {{baseUrl}}/api/users
+Content-Type: application/json
+
+{
+  "name": {
+    "firstName": "Updated",
+    "lastName": "Name"
+  },
+  "takeHomePay": 50000,
+  "defaultCurrency": "GBP"
+}
+
+###
+
+### Update User - Invalid Token (401)
+PUT {{baseUrl}}/api/users
+Authorization: Bearer invalid.token.here
+Content-Type: application/json
+
+{
+  "name": {
+    "firstName": "Updated",
+    "lastName": "Name"
+  },
+  "takeHomePay": 50000,
+  "defaultCurrency": "GBP"
+}
+
+###
+
+### Update User - Missing First Name (400)
+PUT {{baseUrl}}/api/users
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": {
+    "lastName": "Name"
+  },
+  "takeHomePay": 50000,
+  "defaultCurrency": "GBP"
+}
+
+###
+
+### Update User - Missing Last Name (400)
+PUT {{baseUrl}}/api/users
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": {
+    "firstName": "Updated"
+  },
+  "takeHomePay": 50000,
+  "defaultCurrency": "GBP"
+}
+
+###
+
+### Update User - Empty First Name (400)
+PUT {{baseUrl}}/api/users
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": {
+    "firstName": "",
+    "lastName": "Name"
+  },
+  "takeHomePay": 50000,
+  "defaultCurrency": "GBP"
+}
+
+###
+
+### Update User - Empty Last Name (400)
+PUT {{baseUrl}}/api/users
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": {
+    "firstName": "Updated",
+    "lastName": ""
+  },
+  "takeHomePay": 50000,
+  "defaultCurrency": "GBP"
+}
+
+###
+
+### Update User - Negative Salary (400)
+PUT {{baseUrl}}/api/users
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": {
+    "firstName": "Updated",
+    "lastName": "Name"
+  },
+  "takeHomePay": -1000,
+  "defaultCurrency": "GBP"
+}
+
+###
+
+### Update User - Salary Too High (400)
+PUT {{baseUrl}}/api/users
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": {
+    "firstName": "Updated",
+    "lastName": "Name"
+  },
+  "takeHomePay": 1000001,
+  "defaultCurrency": "GBP"
+}
+
+###
+
+### Update User - Salary Too Many Decimals (400)
+PUT {{baseUrl}}/api/users
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": {
+    "firstName": "Updated",
+    "lastName": "Name"
+  },
+  "takeHomePay": 50000.999,
+  "defaultCurrency": "GBP"
+}
+
+###
+
+### Update User - Invalid Currency (400)
+PUT {{baseUrl}}/api/users
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": {
+    "firstName": "Updated",
+    "lastName": "Name"
+  },
+  "takeHomePay": 50000,
+  "defaultCurrency": "JPY"
+}
+
+###
+
+### Update User - Missing takeHomePay (400)
+PUT {{baseUrl}}/api/users
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": {
+    "firstName": "Updated",
+    "lastName": "Name"
+  },
+  "defaultCurrency": "GBP"
+}
+
+###
+
+### Update User - Missing defaultCurrency (400)
+PUT {{baseUrl}}/api/users
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": {
+    "firstName": "Updated",
+    "lastName": "Name"
+  },
+  "takeHomePay": 50000
+}
+
+###
+
+### Update User - Wrong Type for takeHomePay (400)
+PUT {{baseUrl}}/api/users
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": {
+    "firstName": "Updated",
+    "lastName": "Name"
+  },
+  "takeHomePay": "50000",
+  "defaultCurrency": "GBP"
+}
+
+###
+
+### Update User - Missing Entire Name Object (400)
+PUT {{baseUrl}}/api/users
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "takeHomePay": 50000,
+  "defaultCurrency": "GBP"
+}
+
+###
+
+### ===========================================
+### UPDATE SALARY
+### ===========================================
+
+### Update Salary - Success (200)
+PATCH {{baseUrl}}/api/users/salary
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "salary": 55000.50
+}
+
+###
+
+### Update Salary - Invalid (Negative) (400)
+PATCH {{baseUrl}}/api/users/salary
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "salary": -1000
+}
+
+###
+
+### Update Salary - Invalid (Too Many Decimals) (400)
+PATCH {{baseUrl}}/api/users/salary
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "salary": 50000.999
+}
+
+###
+
+### ===========================================
+### UPDATE THEME
+### ===========================================
+
+### Update Theme - Success (200)
+PUT {{baseUrl}}/api/users/theme
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "defaultTheme": "dark"
+}
+
+###
+
+### Update Theme - Invalid Value (400)
+PUT {{baseUrl}}/api/users/theme
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "defaultTheme": "blue"
+}
+
+###
+
+### ===========================================
+### UPDATE FILTERS
+### ===========================================
+
+### Update Account Filters - Success (200)
+PUT {{baseUrl}}/api/users/account-filters
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+[
+  { "type": "current", "enabled": true },
+  { "type": "savings", "enabled": false },
+  { "type": "investment", "enabled": true },
+  { "type": "joint", "enabled": false }
+]
+
+###
+
+### Update Bill Filters - Success (200)
+PUT {{baseUrl}}/api/users/bill-filters
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+[
+  { "type": "housing", "enabled": true },
+  { "type": "utilities", "enabled": true },
+  { "type": "entertainment", "enabled": false }
+]
+
+###
+
+### Update Expense Filters - Success (200)
+PUT {{baseUrl}}/api/users/expense-filters
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+[
+  { "type": "food", "enabled": true },
+  { "type": "transport", "enabled": true },
+  { "type": "entertainment", "enabled": false }
+]
+
+###
+
+### Update Savings Filters - Success (200)
+PUT {{baseUrl}}/api/users/savings-filters
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+[
+  { "type": "communication", "enabled": true },  
+  { "type": "transport", "enabled": false }
+]
+
+###
+
+### ===========================================
+### UPDATE FILTERS - INVALID
+### ===========================================
+
+### Update Account Filters - Invalid Filter Type (400)
+PUT {{baseUrl}}/api/users/account-filters
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+[
+  { "type": "invalid", "enabled": true }
+]
+
+###

@@ -1,0 +1,542 @@
+### ===========================================
+### ACCOUNT TESTS
+### ===========================================
+
+@baseUrl = http://localhost:5300
+@email = test@example.com
+@password = TestPassword123!
+
+### ===========================================
+### SETUP - LOGIN TO GET TOKEN
+### ===========================================
+
+### Login - Get Access Token
+# @name login
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{email}}",
+  "password": "{{password}}"
+}
+
+###
+
+@accessToken = {{login.response.body.accessToken}}
+
+### ===========================================
+### GET ALL ACCOUNTS
+### ===========================================
+
+### Get All Accounts - Success (200)
+GET {{baseUrl}}/api/accounts
+Authorization: Bearer {{accessToken}}
+
+###
+
+### Get All Accounts - No Token (401)
+GET {{baseUrl}}/api/accounts
+
+###
+
+### Get All Accounts - Invalid Token (401)
+GET {{baseUrl}}/api/accounts
+Authorization: Bearer invalid.token.here
+
+###
+
+### ===========================================
+### ADD ACCOUNT
+### ===========================================
+
+### Add Account - Success (201)
+# @name addAccount
+POST {{baseUrl}}/api/accounts
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Not default",
+  "amount": 5000,
+  "acceptsFunds": true,
+  "receivesSalary": true,
+  "type": "current",
+  "institution": "Chase Bank"
+}
+
+###
+
+@accountId = {{addAccount.response.body._id}}
+
+### Add Account - Minimal (Success with defaults) (201)
+POST {{baseUrl}}/api/accounts
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Savings Account"
+}
+
+###
+
+### Add Account - With Target Monthly Amount (201)
+POST {{baseUrl}}/api/accounts
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Emergency Fund",
+  "type": "savings",
+  "targetMonthlyAmount": {
+    "amount": 500,
+    "splitBetween": 2
+  }
+}
+
+###
+
+### Add Account - No Token (401)
+POST {{baseUrl}}/api/accounts
+Content-Type: application/json
+
+{
+  "name": "Test Account"
+}
+
+###
+
+### Add Account - Invalid Token (401)
+POST {{baseUrl}}/api/accounts
+Authorization: Bearer invalid.token.here
+Content-Type: application/json
+
+{
+  "name": "Test Account"
+}
+
+###
+
+### Add Account - Missing Name (400)
+POST {{baseUrl}}/api/accounts
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "amount": 1000,
+  "type": "current"
+}
+
+###
+
+### Add Account - Empty Name (400)
+POST {{baseUrl}}/api/accounts
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "",
+  "amount": 1000
+}
+
+###
+
+### Add Account - Invalid Type (400)
+POST {{baseUrl}}/api/accounts
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Test Account",
+  "type": "checking"
+}
+
+###
+
+### Add Account - Invalid Amount Type (400)
+POST {{baseUrl}}/api/accounts
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Test Account",
+  "amount": "1000"
+}
+
+###
+
+### Add Account - Invalid acceptsFunds Type (400)
+POST {{baseUrl}}/api/accounts
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Test Account",
+  "acceptsFunds": "yes"
+}
+
+###
+
+### Add Account - Invalid receivesSalary Type (400)
+POST {{baseUrl}}/api/accounts
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Test Account",
+  "receivesSalary": "true"
+}
+
+###
+
+### Add Account - Invalid isDefault Type (400)
+POST {{baseUrl}}/api/accounts
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Test Account",
+  "isDefault": 1
+}
+
+###
+
+### Add Account - Invalid institution Type (400)
+POST {{baseUrl}}/api/accounts
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Test Account",
+  "institution": 123
+}
+
+###
+
+### Add Account - Missing targetMonthlyAmount.amount (400)
+POST {{baseUrl}}/api/accounts
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Test Account",
+  "targetMonthlyAmount": {
+    "splitBetween": 2
+  }
+}
+
+###
+
+### Add Account - Missing targetMonthlyAmount.splitBetween (400)
+POST {{baseUrl}}/api/accounts
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Test Account",
+  "targetMonthlyAmount": {
+    "amount": 500
+  }
+}
+
+###
+
+### Add Account - splitBetween Too Low (400)
+POST {{baseUrl}}/api/accounts
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Test Account",
+  "targetMonthlyAmount": {
+    "amount": 500,
+    "splitBetween": 0
+  }
+}
+
+###
+
+### Add Account - splitBetween Too High (400)
+POST {{baseUrl}}/api/accounts
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Test Account",
+  "targetMonthlyAmount": {
+    "amount": 500,
+    "splitBetween": 11
+  }
+}
+
+###
+
+### ===========================================
+### UPDATE ACCOUNT
+### ===========================================
+
+### Update Account - Success (200)
+PUT {{baseUrl}}/api/accounts/{{accountId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Updated Main Checking",
+  "amount": 6000,
+  "acceptsFunds": true,
+  "receivesSalary": false,
+  "type": "current",
+  "institution": "Updated Bank"
+}
+
+###
+
+### Update Account - With Target Monthly Amount (200)
+PUT {{baseUrl}}/api/accounts/{{accountId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Updated Account",
+  "targetMonthlyAmount": {
+    "amount": 1000,
+    "splitBetween": 3
+  }
+}
+
+###
+
+### Update Account - Remove Target Monthly Amount (200)
+PUT {{baseUrl}}/api/accounts/{{accountId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Updated Account",
+  "targetMonthlyAmount": null
+}
+
+###
+
+### Update Account - No Token (401)
+PUT {{baseUrl}}/api/accounts/{{accountId}}
+Content-Type: application/json
+
+{
+  "name": "Updated Account"
+}
+
+###
+
+### Update Account - Invalid Token (401)
+PUT {{baseUrl}}/api/accounts/{{accountId}}
+Authorization: Bearer invalid.token.here
+Content-Type: application/json
+
+{
+  "name": "Updated Account"
+}
+
+###
+
+### Update Account - Invalid Account ID (400 or 404)
+PUT {{baseUrl}}/api/accounts/invalid-id
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Updated Account"
+}
+
+###
+
+### Update Account - Non-existent Account ID (404)
+PUT {{baseUrl}}/api/accounts/507f1f77bcf86cd799439011
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Updated Account"
+}
+
+###
+
+### Update Account - Missing Name (400)
+PUT {{baseUrl}}/api/accounts/{{accountId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "amount": 1000
+}
+
+###
+
+### Update Account - Empty Name (400)
+PUT {{baseUrl}}/api/accounts/{{accountId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": ""
+}
+
+###
+
+### Update Account - Invalid Type (400)
+PUT {{baseUrl}}/api/accounts/{{accountId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Updated Account",
+  "type": "credit"
+}
+
+###
+
+### ===========================================
+### REORDER ACCOUNTS
+### ===========================================
+
+### Setup - Create Account 1 for Reordering
+# @name reorderAccount1
+POST {{baseUrl}}/api/accounts
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Reorder Test 1"
+}
+
+###
+
+@reorderAccountId1 = {{reorderAccount1.response.body._id}}
+
+### Setup - Create Account 2 for Reordering
+# @name reorderAccount2
+POST {{baseUrl}}/api/accounts
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Reorder Test 2"
+}
+
+###
+
+@reorderAccountId2 = {{reorderAccount2.response.body._id}}
+
+### Setup - Create Account 3 for Reordering
+# @name reorderAccount3
+POST {{baseUrl}}/api/accounts
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Reorder Test 3"
+}
+
+###
+
+@reorderAccountId3 = {{reorderAccount3.response.body._id}}
+
+### Reorder Accounts - Success (200)
+PUT {{baseUrl}}/api/accounts/reorder
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+[
+  "{{reorderAccountId3}}",
+  "{{reorderAccountId1}}",
+  "{{reorderAccountId2}}"
+]
+
+###
+
+### Reorder Accounts - No Token (401)
+PUT {{baseUrl}}/api/accounts/reorder
+Content-Type: application/json
+
+[
+  "{{reorderAccountId1}}",
+  "{{reorderAccountId2}}"
+]
+
+###
+
+### Reorder Accounts - Invalid Token (401)
+PUT {{baseUrl}}/api/accounts/reorder
+Authorization: Bearer invalid.token.here
+Content-Type: application/json
+
+[
+  "{{reorderAccountId1}}",
+  "{{reorderAccountId2}}"
+]
+
+###
+
+### Reorder Accounts - Empty Array (400)
+PUT {{baseUrl}}/api/accounts/reorder
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+[]
+
+###
+
+### Reorder Accounts - Invalid ID Format (400)
+PUT {{baseUrl}}/api/accounts/reorder
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+[
+  "invalid-id",
+  "{{reorderAccountId1}}"
+]
+
+###
+
+### Reorder Accounts - Not an Array (400)
+PUT {{baseUrl}}/api/accounts/reorder
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "ids": ["{{reorderAccountId1}}"]
+}
+
+###
+
+### ===========================================
+### DELETE ACCOUNT
+### ===========================================
+
+### Delete Account - Success (200 or 204)
+DELETE {{baseUrl}}/api/accounts/{{accountId}}
+Authorization: Bearer {{accessToken}}
+
+###
+
+### Delete Account - No Token (401)
+DELETE {{baseUrl}}/api/accounts/{{accountId}}
+
+###
+
+### Delete Account - Invalid Token (401)
+DELETE {{baseUrl}}/api/accounts/{{accountId}}
+Authorization: Bearer invalid.token.here
+
+###
+
+### Delete Account - Invalid Account ID (400 or 404)
+DELETE {{baseUrl}}/api/accounts/invalid-id
+Authorization: Bearer {{accessToken}}
+
+###
+
+### Delete Account - Non-existent Account ID (404)
+DELETE {{baseUrl}}/api/accounts/507f1f77bcf86cd799439011
+Authorization: Bearer {{accessToken}}
+
+###

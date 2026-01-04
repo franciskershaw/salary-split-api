@@ -1,26 +1,42 @@
-import express from "express";
-import asyncHandler from "express-async-handler";
-import { authenticateToken } from "../../auth/middleware/auth.middleware";
-import * as expenseController from "../controllers/_expense.controller";
+import { Hono } from "hono";
+import { authenticate } from "../../../core/middleware/auth.middleware";
+import validateObjectId from "../../../core/middleware/validateObjectId.middleware";
+import expenseController from "../controllers/_expense.controller";
+import { validate } from "../../../core/utils/validate";
+import { expenseSchema } from "../validation/expense.validation";
+import { reorderRecurringItemsSchema } from "../../shared/recurring-items/validation/reorder.validation";
 
-const router = express.Router();
+const expenseRoutes = new Hono();
 
-router.get("/", authenticateToken, asyncHandler(expenseController.getExpenses));
-router.post("/", authenticateToken, asyncHandler(expenseController.addExpense));
-router.put(
+expenseRoutes.get("/", authenticate, expenseController.getExpenses);
+
+expenseRoutes.post(
+  "/",
+  authenticate,
+  validate("json", expenseSchema),
+  expenseController.addExpense
+);
+
+expenseRoutes.put(
   "/reorder",
-  authenticateToken,
-  asyncHandler(expenseController.reorderExpenses)
-);
-router.put(
-  "/:expenseId",
-  authenticateToken,
-  asyncHandler(expenseController.editExpense)
-);
-router.delete(
-  "/:expenseId",
-  authenticateToken,
-  asyncHandler(expenseController.deleteExpense)
+  authenticate,
+  validate("json", reorderRecurringItemsSchema),
+  expenseController.reorderExpenses
 );
 
-export default router;
+expenseRoutes.put(
+  "/:expenseId",
+  authenticate,
+  validateObjectId("expenseId"),
+  validate("json", expenseSchema),
+  expenseController.editExpense
+);
+
+expenseRoutes.delete(
+  "/:expenseId",
+  authenticate,
+  validateObjectId("expenseId"),
+  expenseController.deleteExpense
+);
+
+export default expenseRoutes;

@@ -1,29 +1,23 @@
-import { Request, Response, NextFunction } from "express";
-import updateThemeSchema from "../validation/updateTheme.validation";
-import User, { IUser } from "../model/user.model";
-import validateRequest from "../../../core/utils/validate";
+import { Context } from "hono";
+import User from "../model/user.model";
 import { NotFoundError } from "../../../core/utils/errors";
 
-const updateTheme = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const user = req.user as IUser;
+const updateTheme = async (c: Context) => {
+  const userId = c.get("user")._id;
 
-    const { defaultTheme } = validateRequest(req.body, updateThemeSchema);
+  const { defaultTheme } = await c.req.json();
 
-    const updatedUser = await User.findByIdAndUpdate(
-      user._id,
-      { defaultTheme },
-      { new: true }
-    );
+  const updatedUser = await User.findByIdAndUpdate(
+    userId,
+    { defaultTheme },
+    { new: true }
+  );
 
-    if (!updatedUser) {
-      throw new NotFoundError("User not found");
-    }
-
-    res.status(200).json(updatedUser);
-  } catch (error) {
-    next(error);
+  if (!updatedUser) {
+    throw new NotFoundError("User not found");
   }
+
+  return c.json(updatedUser, 200);
 };
 
 export default updateTheme;

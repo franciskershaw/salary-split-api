@@ -1,29 +1,24 @@
-import { Request, Response, NextFunction } from "express";
-import updateUserSchema from "../validation/updateUser.validation";
-import User, { IUser } from "../model/user.model";
-import validateRequest from "../../../core/utils/validate";
+import { Context } from "hono";
+import User from "../model/user.model";
+import { UpdateUserInput } from "../validation/updateUser.user.validation";
 import { NotFoundError } from "../../../core/utils/errors";
 
-const updateUser = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const user = req.user as IUser;
+const updateUser = async (c: Context) => {
+  const userId = c.get("user")?._id;
 
-    const value = validateRequest(req.body, updateUserSchema);
-
-    const updatedUser = await User.findByIdAndUpdate(
-      user._id,
-      { ...value },
-      { new: true }
-    );
-
-    if (!updatedUser) {
-      throw new NotFoundError("User not found");
-    }
-
-    res.status(200).json(updatedUser);
-  } catch (error) {
-    next(error);
+  if (!userId) {
+    throw new NotFoundError("User not found");
   }
+
+  const body = await c.req.json<UpdateUserInput>();
+
+  const updatedUser = await User.findByIdAndUpdate(userId, body, { new: true });
+
+  if (!updatedUser) {
+    throw new NotFoundError("User not found");
+  }
+
+  return c.json(updatedUser, 200);
 };
 
 export default updateUser;

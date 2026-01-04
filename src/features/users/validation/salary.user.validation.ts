@@ -1,13 +1,19 @@
-import joi from "joi";
+import { z } from "zod";
 
-const updateSalarySchema = joi.object({
-  salary: joi.number().required().min(0).max(1000000).precision(2).messages({
-    "number.base": "Salary must be a number.",
-    "number.min": "Salary cannot be negative.",
-    "number.max": "Salary cannot exceed 1,000,000.",
-    "number.precision": "Salary can only have up to 2 decimal places.",
-    "any.required": "Salary is required.",
-  }),
-});
+export const updateSalarySchema = z
+  .object({
+    salary: z
+      .number()
+      .min(0, "Salary cannot be negative.")
+      .max(1000000, "Salary cannot exceed 1,000,000.")
+      .refine(
+        (val) => {
+          const decimalPart = val.toString().split(".")[1];
+          return !decimalPart || decimalPart.length <= 2;
+        },
+        { error: "Salary can only have up to 2 decimal places." }
+      ),
+  })
+  .strict();
 
-export default updateSalarySchema;
+export type UpdateSalaryInput = z.infer<typeof updateSalarySchema>;

@@ -1,34 +1,65 @@
-import { Request, Response, NextFunction } from "express";
+// src/core/middleware/error.middleware.ts
+import { ErrorHandler } from "hono";
+import { HTTPException } from "hono/http-exception";
 import { UnauthorizedError } from "../utils/errors";
 import dayjs from "dayjs";
+import { ZodError } from "zod";
 
-export const errorHandler = (
-  err: any,
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const errorHandler: ErrorHandler = (err, c) => {
+  // Log in development
   if (process.env.NODE_ENV === "development") {
-    console.log(dayjs().format("MMMM D YYYY, h:mm:ss a"), err);
+    console.log(dayjs().format("MMM D YYYY, h:mm:ss a"), err);
   }
 
-  const statusCode = err.statusCode || 500;
-  let message = err.message;
+  // Handle Zod validation errors
+  if (err instanceof ZodError) {
+    const errors = err.issues.map((issue) => {
+      let message = issue.message;
 
-  if (statusCode === 500) {
-    message = "An unexpected error occurred, please try again later.";
+      // Check for "required field" errors using error code
+      if (issue.code === "invalid_type" && issue.expected === "string") {
+        // Get the field name from the path
+        const fieldName = issue.path[issue.path.length - 1];
+        message = `${String(fieldName)} is required.`;
+      }
+
+      return {
+        field: issue.path.join("."),
+        message: message,
+      };
+    });
+
+    return c.json({ message: "Validation error", errors }, 400);
   }
-  res.status(statusCode);
 
+  // UnauthorizedError (only one that needs errorCode)
   if (err instanceof UnauthorizedError) {
-    res.status(statusCode).json({
-      message: message,
-      errorCode: err.errorCode,
-    });
-  } else {
-    res.status(statusCode).json({
-      message: message,
-      stack: process.env.NODE_ENV === "production" ? null : err.stack,
-    });
+    return c.json(
+      {
+        message: err.message,
+        errorCode: err.errorCode, // Frontend needs this
+      },
+      401
+    );
   }
+
+  // Handle all HTTPException errors (including your custom errors)
+  if (err instanceof HTTPException) {
+    return c.json(
+      {
+        message: err.message,
+      },
+      err.status
+    );
+  }
+
+  // Default 500 for unexpected errors
+  const message = "An unexpected error occurred, please try again later.";
+  return c.json(
+    {
+      message,
+      stack: process.env.NODE_ENV === "production" ? undefined : err.stack,
+    },
+    500
+  );
 };

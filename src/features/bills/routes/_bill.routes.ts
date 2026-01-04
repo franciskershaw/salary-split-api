@@ -1,26 +1,42 @@
-import express from "express";
-import asyncHandler from "express-async-handler";
-import { authenticateToken } from "../../auth/middleware/auth.middleware";
-import * as billController from "../controllers/_bill.controller";
+import { Hono } from "hono";
+import { authenticate } from "../../../core/middleware/auth.middleware";
+import validateObjectId from "../../../core/middleware/validateObjectId.middleware";
+import billController from "../controllers/_bill.controller";
+import { validate } from "../../../core/utils/validate";
+import { billSchema } from "../validation/bill.validation";
+import { reorderRecurringItemsSchema } from "../../shared/recurring-items/validation/reorder.validation";
 
-const router = express.Router();
+const billRoutes = new Hono();
 
-router.get("/", authenticateToken, asyncHandler(billController.getBills));
-router.post("/", authenticateToken, asyncHandler(billController.addBill));
-router.put(
+billRoutes.get("/", authenticate, billController.getBills);
+
+billRoutes.post(
+  "/",
+  authenticate,
+  validate("json", billSchema),
+  billController.addBill
+);
+
+billRoutes.put(
   "/reorder",
-  authenticateToken,
-  asyncHandler(billController.reorderBills)
-);
-router.put(
-  "/:billId",
-  authenticateToken,
-  asyncHandler(billController.editBill)
-);
-router.delete(
-  "/:billId",
-  authenticateToken,
-  asyncHandler(billController.deleteBill)
+  authenticate,
+  validate("json", reorderRecurringItemsSchema),
+  billController.reorderBills
 );
 
-export default router;
+billRoutes.put(
+  "/:billId",
+  authenticate,
+  validateObjectId("billId"),
+  validate("json", billSchema),
+  billController.editBill
+);
+
+billRoutes.delete(
+  "/:billId",
+  authenticate,
+  validateObjectId("billId"),
+  billController.deleteBill
+);
+
+export default billRoutes;

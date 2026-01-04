@@ -1,4 +1,6 @@
-import { Response } from "express";
+import { Context } from "hono";
+import { setCookie } from "hono/cookie";
+import { ContentfulStatusCode } from "hono/utils/http-status";
 import {
   generateAccessToken,
   generateRefreshToken,
@@ -10,20 +12,21 @@ import {
 } from "../../../core/utils/constants";
 
 const sendTokensAndUser = async (
-  res: Response,
+  c: Context,
   user: IUser,
-  status: number = 200
+  status: ContentfulStatusCode = 200
 ) => {
-  const accessToken = generateAccessToken(user);
-  const refreshToken = generateRefreshToken(user);
+  const accessToken = await generateAccessToken(user);
+  const refreshToken = await generateRefreshToken(user);
 
-  res.cookie(
+  setCookie(
+    c,
     REFRESH_TOKEN_COOKIE_NAME,
     refreshToken,
     REFRESH_TOKEN_COOKIE_OPTIONS
   );
 
-  res.status(status).json({ ...user, accessToken });
+  return c.json({ ...user, accessToken }, status);
 };
 
 export { sendTokensAndUser };

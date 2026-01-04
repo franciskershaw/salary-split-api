@@ -1,7 +1,13 @@
-import getUser from "./getUser.controller";
-import updateSalary from "./updateSalary.controller";
-import updateFilters from "./updateFilters.controller";
+import getUserInfo from "./getUser.controller";
 import updateUser from "./updateUser.controller";
+import updateFilters from "./updateFilters.controller";
+import updateSalary from "./updateSalary.controller";
 import updateTheme from "./updateTheme.controller";
 
-export { getUser, updateSalary, updateFilters, updateUser, updateTheme };
+export default {
+  getUserInfo,
+  updateUser,
+  updateFilters,
+  updateSalary,
+  updateTheme,
+};

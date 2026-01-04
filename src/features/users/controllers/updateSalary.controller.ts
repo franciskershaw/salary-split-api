@@ -1,36 +1,23 @@
-import { Request, Response, NextFunction } from "express";
-import updateSalarySchema from "../validation/salary.user.validation";
-import User, { IUser } from "../model/user.model";
-import validateRequest from "../../../core/utils/validate";
+import { Context } from "hono";
+import User from "../model/user.model";
 import { NotFoundError } from "../../../core/utils/errors";
 
-const updateSalary = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const user = req.user as IUser;
+const updateSalary = async (c: Context) => {
+  const userId = c.get("user")._id;
 
-    const { salary } = validateRequest(req.body, updateSalarySchema);
+  const { salary } = await c.req.json();
 
-    const updatedUser = await User.findByIdAndUpdate(
-      user._id,
-      { takeHomePay: salary },
-      { new: true }
-    );
+  const updatedUser = await User.findByIdAndUpdate(
+    userId,
+    { takeHomePay: salary },
+    { new: true }
+  );
 
-    if (!updatedUser) {
-      throw new NotFoundError("User not found");
-    }
-
-    res.status(200).json({
-      message: "Salary updated successfully",
-      takeHomePay: updatedUser.takeHomePay,
-    });
-  } catch (error) {
-    next(error);
+  if (!updatedUser) {
+    throw new NotFoundError("User not found");
   }
+
+  return c.json(updatedUser, 200);
 };
 
 export default updateSalary;

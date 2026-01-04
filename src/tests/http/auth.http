@@ -1,0 +1,201 @@
+### ===========================================
+### AUTHENTICATION TESTS
+### ===========================================
+
+@baseUrl = http://localhost:5300
+@email = test@example.com
+@password = TestPassword123!
+
+### ===========================================
+### HEALTH CHECK
+### ===========================================
+
+### Health Check
+GET {{baseUrl}}/
+
+###
+
+### ===========================================
+### REGISTER TESTS
+### ===========================================
+
+### Register - Success (201)
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "{{email}}",
+  "password": "{{password}}",
+  "name": {
+    "firstName": "Test",
+    "lastName": "User"
+  }
+}
+
+###
+
+### Register - Duplicate User (409)
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "{{email}}",
+  "password": "{{password}}",
+  "name": {
+    "firstName": "Test",
+    "lastName": "User"
+  }
+}
+
+###
+
+### Register - Invalid Email (400)
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "not-an-email",
+  "password": "{{password}}",
+  "name": {
+    "firstName": "Test",
+    "lastName": "User"
+  }
+}
+
+###
+
+### Register - Password Too Short (400)
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "newuser@example.com",
+  "password": "short",
+  "name": {
+    "firstName": "Test",
+    "lastName": "User"
+  }
+}
+
+###
+
+### Register - Missing First Name (400)
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "newuser2@example.com",
+  "password": "{{password}}",
+  "name": {
+    "lastName": "User"
+  }
+}
+
+###
+
+### Register - No Last Name (Success - lastName optional)
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "onename@example.com",
+  "password": "{{password}}",
+  "name": {
+    "firstName": "SingleName"
+  }
+}
+
+###
+
+### Register - Missing Password (400)
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "test2@example.com",
+  "name": {
+    "firstName": "Test",
+    "lastName": "User"
+  }
+}
+
+###
+
+### ===========================================
+### LOGIN TESTS
+### ===========================================
+
+### Login - Success (200) - SAVE TOKEN
+# @name login
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{email}}",
+  "password": "{{password}}"
+}
+
+###
+
+### Login - Wrong Password (401)
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{email}}",
+  "password": "WrongPassword123!"
+}
+
+###
+
+### Login - User Not Found (401)
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "nonexistent@example.com",
+  "password": "{{password}}"
+}
+
+###
+
+### Login - Invalid Email Format (400)
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "not-an-email",
+  "password": "{{password}}"
+}
+
+###
+
+### Login - Missing Password (400)
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{email}}"
+}
+
+###
+
+### ===========================================
+### SESSION & REFRESH TESTS (TODO)
+### ===========================================
+
+###
+
+### Refresh Access Token
+GET {{baseUrl}}/api/auth/refresh-token
+
+###
+
+### ===========================================
+### LOGOUT TEST
+### ===========================================
+
+### Logout
+POST {{baseUrl}}/api/auth/logout
+
+###
