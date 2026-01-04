@@ -4,6 +4,8 @@
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
+    "docker:build": "docker build -t salary-split-api .",
+    "docker:prod": "docker run -p 5300:5300 salary-split-api",
     "lint": "eslint src --ext .ts",
     "lint:fix": "eslint src --ext .ts --fix"
   },
