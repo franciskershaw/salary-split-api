@@ -1,8 +1,8 @@
 import Bill from "../model/bill.model";
-import { createAddController } from "../../shared/recurring-items/add.controller";
-import { createEditController } from "../../shared/recurring-items/edit.controller";
-import { createDeleteController } from "../../shared/recurring-items/delete.controller";
-import { createGetController } from "../../shared/recurring-items/get.controller";
+import { createAddController } from "../../shared/recurring-items/controllers/add.controller";
+import { createEditController } from "../../shared/recurring-items/controllers/edit.controller";
+import { createDeleteController } from "../../shared/recurring-items/controllers/delete.controller";
+import { createGetController } from "../../shared/recurring-items/controllers/get.controller";
 import { createReorderController } from "../../shared/reorder/reorder.controller";
 
 export default {

@@ -1,7 +1,7 @@
 import { Context } from "hono";
 import { Model } from "mongoose";
-import User from "../../users/model/user.model";
-import { ConflictError, NotFoundError } from "../../../core/utils/errors";
+import User from "../../../users/model/user.model";
+import { ConflictError, NotFoundError } from "../../../../core/utils/errors";
 
 export const createEditController = (ItemModel: Model<any>) => {
   return async (c: Context) => {

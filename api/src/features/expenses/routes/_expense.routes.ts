@@ -4,7 +4,7 @@ import validateObjectId from "../../../core/middleware/validateObjectId.middlewa
 import expenseController from "../controllers/_expense.controller";
 import { validate } from "../../../core/utils/validate";
 import { expenseSchema } from "../validation/expense.validation";
-import { reorderExpensesSchema } from "../validation/reorderExpense.validation";
+import { reorderRecurringItemsSchema } from "../../shared/recurring-items/validation/reorder.validation";
 
 const expenseRoutes = new Hono();
 
@@ -20,7 +20,7 @@ expenseRoutes.post(
 expenseRoutes.put(
   "/reorder",
   authenticate,
-  validate("json", reorderExpensesSchema),
+  validate("json", reorderRecurringItemsSchema),
   expenseController.reorderExpenses
 );
 

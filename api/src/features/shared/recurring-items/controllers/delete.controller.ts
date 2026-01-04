@@ -1,7 +1,7 @@
 import { Context } from "hono";
 import { Model } from "mongoose";
-import User from "../../users/model/user.model";
-import { NotFoundError } from "../../../core/utils/errors";
+import User from "../../../users/model/user.model";
+import { NotFoundError } from "../../../../core/utils/errors";
 
 export const createDeleteController = (ItemModel: Model<any>) => {
   return async (c: Context) => {
