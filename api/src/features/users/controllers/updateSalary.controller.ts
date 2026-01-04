@@ -5,10 +5,7 @@ import { NotFoundError } from "../../../core/utils/errors";
 const updateSalary = async (c: Context) => {
   const userId = c.get("user")._id;
 
-  console.log("userId", userId);
-
   const { salary } = await c.req.json();
-  console.log("salary", salary);
 
   const updatedUser = await User.findByIdAndUpdate(
     userId,

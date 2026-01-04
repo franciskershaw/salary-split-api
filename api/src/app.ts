@@ -31,7 +31,7 @@ export const createApp = () => {
         ? process.env.CORS_ORIGIN_NETWORK || "http://localhost:5173"
         : process.env.CORS_ORIGIN || "http://localhost:5173",
       credentials: true,
-      allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+      allowMethods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
       allowHeaders: ["Content-Type", "Authorization"],
     })
   );
