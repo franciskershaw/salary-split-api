@@ -1,9 +1,11 @@
 import { Context } from "hono";
-import { googleProvider } from "../../../utils/auth.providers";
-import { generateState, generateCodeVerifier } from "arctic";
+import { getGoogleProvider, getArcticHelpers } from "../../../utils/auth.providers";
 import { setCookie } from "hono/cookie";
 
 export const googleAuth = async (c: Context) => {
+  const { generateState, generateCodeVerifier } = await getArcticHelpers();
+  const googleProvider = await getGoogleProvider();
+  
   const state = generateState();
   const codeVerifier = generateCodeVerifier();
   const scopes = ["openid", "profile", "email"];
