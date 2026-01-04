@@ -8,7 +8,7 @@ import { createReorderController } from "../../shared/reorder/reorder.controller
 export default {
   addBill: createAddController(Bill),
   getBills: createGetController(Bill),
-  editBill: createEditController(Bill),
-  deleteBill: createDeleteController(Bill),
+  editBill: createEditController(Bill, "billId"),
+  deleteBill: createDeleteController(Bill, "billId"),
   reorderBills: createReorderController(Bill, "bill"),
 };

@@ -3,10 +3,13 @@ import { Model } from "mongoose";
 import User from "../../../users/model/user.model";
 import { ConflictError, NotFoundError } from "../../../../core/utils/errors";
 
-export const createEditController = (ItemModel: Model<any>) => {
+export const createEditController = (
+  ItemModel: Model<any>,
+  paramId: string
+) => {
   return async (c: Context) => {
     const userId = c.get("user")._id;
-    const itemId = c.req.param("billId") || c.req.param("expenseId") || c.req.param("savingId");
+    const itemId = c.req.param(paramId);
     const body = await c.req.json();
 
     const [user, existingItem] = await Promise.all([

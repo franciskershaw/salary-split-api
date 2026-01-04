@@ -1,12 +1,9 @@
 import { z } from "zod";
-import { BILL_TYPES, BillType } from "../../../core/utils/constants";
 import mongoose from "mongoose";
 
-const billTypeValues = Object.values(BILL_TYPES) as [BillType, ...BillType[]];
-
-export const expenseSchema = z
+export const savingsSchema = z
   .object({
-    name: z.string().min(1, "Please provide an expense name."),
+    name: z.string().min(1, "Please provide a savings name."),
     amount: z.number().min(0, "Amount cannot be negative."),
     dueDate: z
       .number()
@@ -19,8 +16,7 @@ export const expenseSchema = z
       .refine((value) => mongoose.Types.ObjectId.isValid(value), {
         message: "Invalid account ID format",
       }),
-    type: z.enum(billTypeValues),
   })
   .strict();
 
-export type ExpenseInput = z.infer<typeof expenseSchema>;
+export type SavingsInput = z.infer<typeof savingsSchema>;

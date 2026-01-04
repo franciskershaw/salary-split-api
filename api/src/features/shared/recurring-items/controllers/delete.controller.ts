@@ -3,7 +3,7 @@ import { Model } from "mongoose";
 import User from "../../../users/model/user.model";
 import { NotFoundError } from "../../../../core/utils/errors";
 
-export const createDeleteController = (ItemModel: Model<any>) => {
+export const createDeleteController = (ItemModel: Model<any>, paramId: string) => {
   return async (c: Context) => {
     const user = await User.findById(c.get("user")._id);
 
@@ -11,7 +11,7 @@ export const createDeleteController = (ItemModel: Model<any>) => {
       throw new NotFoundError("User not found");
     }
 
-    const itemId = c.req.param("billId") || c.req.param("expenseId") || c.req.param("savingId");
+    const itemId = c.req.param(paramId);
     const item = await ItemModel.findById(itemId);
 
     if (!item || item.createdBy.toString() !== user._id.toString()) {

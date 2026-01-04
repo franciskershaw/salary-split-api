@@ -1,0 +1,572 @@
+### ===========================================
+### SAVINGS TESTS
+### ===========================================
+
+@baseUrl = http://localhost:5300
+@email = test@example.com
+@password = TestPassword123!
+
+### ===========================================
+### SETUP - LOGIN TO GET TOKEN & CREATE ACCOUNT
+### ===========================================
+
+### Login - Get Access Token
+# @name login
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{email}}",
+  "password": "{{password}}"
+}
+
+###
+
+@accessToken = {{login.response.body.accessToken}}
+
+### Setup - Create Account for Savings
+# @name setupAccount
+POST {{baseUrl}}/api/accounts
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Savings Test Accounts"
+}
+
+###
+
+@testAccountId = {{setupAccount.response.body._id}}
+
+### ===========================================
+### GET ALL SAVINGS
+### ===========================================
+
+### Get All Savings - Success (200)
+GET {{baseUrl}}/api/savings
+Authorization: Bearer {{accessToken}}
+
+###
+
+### Get All Savings - No Token (401)
+GET {{baseUrl}}/api/savings
+
+###
+
+### Get All Savings - Invalid Token (401)
+GET {{baseUrl}}/api/savings
+Authorization: Bearer invalid.token.here
+
+###
+
+### ===========================================
+### ADD SAVINGS
+### ===========================================
+
+### Add Savings - Success (201)
+# @name addSavings
+POST {{baseUrl}}/api/savings
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Emergency Funds",
+  "amount": 5000,
+  "dueDate": 1,
+  "account": "{{testAccountId}}"
+}
+
+###
+
+@savingsId = {{addSavings.response.body._id}}
+
+### Add Savings - Different Name (201)
+POST {{baseUrl}}/api/savings
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Vacation Funds",
+  "amount": 2000,
+  "dueDate": 15,
+  "account": "{{testAccountId}}"
+}
+
+###
+
+### Add Savings - No Token (401)
+POST {{baseUrl}}/api/savings
+Content-Type: application/json
+
+{
+  "name": "Test Savings",
+  "amount": 100,
+  "dueDate": 1,
+  "account": "{{testAccountId}}"
+}
+
+###
+
+### Add Savings - Invalid Token (401)
+POST {{baseUrl}}/api/savings
+Authorization: Bearer invalid.token.here
+Content-Type: application/json
+
+{
+  "name": "Test Savings",
+  "amount": 100,
+  "dueDate": 1,
+  "account": "{{testAccountId}}"
+}
+
+###
+
+### Add Savings - Missing Name (400)
+POST {{baseUrl}}/api/savings
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "amount": 100,
+  "dueDate": 1,
+  "account": "{{testAccountId}}"
+}
+
+###
+
+### Add Savings - Empty Name (400)
+POST {{baseUrl}}/api/savings
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "",
+  "amount": 100,
+  "dueDate": 1,
+  "account": "{{testAccountId}}"
+}
+
+###
+
+### Add Savings - Missing Amount (400)
+POST {{baseUrl}}/api/savings
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Test Savings",
+  "dueDate": 1,
+  "account": "{{testAccountId}}"
+}
+
+###
+
+### Add Savings - Negative Amount (400)
+POST {{baseUrl}}/api/savings
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Test Savings",
+  "amount": -100,
+  "dueDate": 1,
+  "account": "{{testAccountId}}"
+}
+
+###
+
+### Add Savings - Invalid Amount Type (400)
+POST {{baseUrl}}/api/savings
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Test Savings",
+  "amount": "100",
+  "dueDate": 1,
+  "account": "{{testAccountId}}"
+}
+
+###
+
+### Add Savings - Missing Due Date (400)
+POST {{baseUrl}}/api/savings
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Test Savings",
+  "amount": 100,
+  "account": "{{testAccountId}}"
+}
+
+###
+
+### Add Savings - Due Date Too Low (400)
+POST {{baseUrl}}/api/savings
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Test Savings",
+  "amount": 100,
+  "dueDate": 0,
+  "account": "{{testAccountId}}"
+}
+
+###
+
+### Add Savings - Due Date Too High (400)
+POST {{baseUrl}}/api/savings
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Test Savings",
+  "amount": 100,
+  "dueDate": 32,
+  "account": "{{testAccountId}}"
+}
+
+###
+
+### Add Savings - Due Date Not Integer (400)
+POST {{baseUrl}}/api/savings
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Test Savings",
+  "amount": 100,
+  "dueDate": 15.5,
+  "account": "{{testAccountId}}"
+}
+
+###
+
+### Add Savings - Missing Account (400)
+POST {{baseUrl}}/api/savings
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Test Savings",
+  "amount": 100,
+  "dueDate": 1
+}
+
+###
+
+### Add Savings - Empty Account (400)
+POST {{baseUrl}}/api/savings
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Test Savings",
+  "amount": 100,
+  "dueDate": 1,
+  "account": ""
+}
+
+###
+
+### Add Savings - Invalid Account ID Format (400)
+POST {{baseUrl}}/api/savings
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Test Savings",
+  "amount": 100,
+  "dueDate": 1,
+  "account": "invalid-id"
+}
+
+###
+
+
+### ===========================================
+### UPDATE SAVINGS
+### ===========================================
+
+### Update Savings - Success (200)
+PUT {{baseUrl}}/api/savings/{{savingsId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Updated Emergency Fund",
+  "amount": 6000,
+  "dueDate": 5,
+  "account": "{{testAccountId}}"
+}
+
+###
+
+### Update Savings - No Token (401)
+PUT {{baseUrl}}/api/savings/{{savingsId}}
+Content-Type: application/json
+
+{
+  "name": "Updated Savings",
+  "amount": 100,
+  "dueDate": 1,
+  "account": "{{testAccountId}}"
+}
+
+###
+
+### Update Savings - Invalid Token (401)
+PUT {{baseUrl}}/api/savings/{{savingsId}}
+Authorization: Bearer invalid.token.here
+Content-Type: application/json
+
+{
+  "name": "Updated Savings",
+  "amount": 100,
+  "dueDate": 1,
+  "account": "{{testAccountId}}"
+}
+
+###
+
+### Update Savings - Invalid Savings ID (400)
+PUT {{baseUrl}}/api/savings/invalid-id
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Updated Savings",
+  "amount": 100,
+  "dueDate": 1,
+  "account": "{{testAccountId}}"
+}
+
+###
+
+### Update Savings - Non-existent Savings ID (404)
+PUT {{baseUrl}}/api/savings/507f1f77bcf86cd799439011
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Updated Savings",
+  "amount": 100,
+  "dueDate": 1,
+  "account": "{{testAccountId}}"
+}
+
+###
+
+### Update Savings - Missing Name (400)
+PUT {{baseUrl}}/api/savings/{{savingsId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "amount": 100,
+  "dueDate": 1,
+  "account": "{{testAccountId}}"
+}
+
+###
+
+### Update Savings - Empty Name (400)
+PUT {{baseUrl}}/api/savings/{{savingsId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "",
+  "amount": 100,
+  "dueDate": 1,
+  "account": "{{testAccountId}}"
+}
+
+###
+
+### Update Savings - Negative Amount (400)
+PUT {{baseUrl}}/api/savings/{{savingsId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Test Savings",
+  "amount": -50,
+  "dueDate": 1,
+  "account": "{{testAccountId}}"
+}
+
+###
+
+### Update Savings - Due Date Out of Range (400)
+PUT {{baseUrl}}/api/savings/{{savingsId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Test Savings",
+  "amount": 100,
+  "dueDate": 35,
+  "account": "{{testAccountId}}"
+}
+
+###
+
+
+### ===========================================
+### REORDER SAVINGS
+### ===========================================
+
+### Setup - Create Savings 1 for Reordering
+# @name reorderSavings1
+POST {{baseUrl}}/api/savings
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Reorder Test 1",
+  "amount": 100,
+  "dueDate": 1,
+  "account": "{{testAccountId}}"
+}
+
+###
+
+@reorderSavingsId1 = {{reorderSavings1.response.body._id}}
+
+### Setup - Create Savings 2 for Reordering
+# @name reorderSavings2
+POST {{baseUrl}}/api/savings
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Reorder Test 2",
+  "amount": 200,
+  "dueDate": 15,
+  "account": "{{testAccountId}}"
+}
+
+###
+
+@reorderSavingsId2 = {{reorderSavings2.response.body._id}}
+
+### Setup - Create Savings 3 for Reordering
+# @name reorderSavings3
+POST {{baseUrl}}/api/savings
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Reorder Test 3",
+  "amount": 300,
+  "dueDate": 25,
+  "account": "{{testAccountId}}"
+}
+
+###
+
+@reorderSavingsId3 = {{reorderSavings3.response.body._id}}
+
+### Reorder Savings - Success (200)
+PUT {{baseUrl}}/api/savings/reorder
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+[
+  "{{reorderSavingsId3}}",
+  "{{reorderSavingsId1}}",
+  "{{reorderSavingsId2}}"
+]
+
+###
+
+### Reorder Savings - No Token (401)
+PUT {{baseUrl}}/api/savings/reorder
+Content-Type: application/json
+
+[
+  "{{reorderSavingsId1}}",
+  "{{reorderSavingsId2}}"
+]
+
+###
+
+### Reorder Savings - Invalid Token (401)
+PUT {{baseUrl}}/api/savings/reorder
+Authorization: Bearer invalid.token.here
+Content-Type: application/json
+
+[
+  "{{reorderSavingsId1}}",
+  "{{reorderSavingsId2}}"
+]
+
+###
+
+### Reorder Savings - Empty Array (400)
+PUT {{baseUrl}}/api/savings/reorder
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+[]
+
+###
+
+### Reorder Savings - Invalid ID Format (400)
+PUT {{baseUrl}}/api/savings/reorder
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+[
+  "invalid-id",
+  "{{reorderSavingsId1}}"
+]
+
+###
+
+### Reorder Savings - Not an Array (400)
+PUT {{baseUrl}}/api/savings/reorder
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "ids": ["{{reorderSavingsId1}}"]
+}
+
+###
+
+### ===========================================
+### DELETE SAVINGS
+### ===========================================
+
+### Delete Savings - Success (200 or 204)
+DELETE {{baseUrl}}/api/savings/{{savingsId}}
+Authorization: Bearer {{accessToken}}
+
+###
+
+### Delete Savings - No Token (401)
+DELETE {{baseUrl}}/api/savings/{{savingsId}}
+
+###
+
+### Delete Savings - Invalid Token (401)
+DELETE {{baseUrl}}/api/savings/{{savingsId}}
+Authorization: Bearer invalid.token.here
+
+###
+
+### Delete Savings - Invalid Savings ID (400)
+DELETE {{baseUrl}}/api/savings/invalid-id
+Authorization: Bearer {{accessToken}}
+
+###
+
+### Delete Savings - Non-existent Savings ID (404)
+DELETE {{baseUrl}}/api/savings/507f1f77bcf86cd799439011
+Authorization: Bearer {{accessToken}}
+
+###
