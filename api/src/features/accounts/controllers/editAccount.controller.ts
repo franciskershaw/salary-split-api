@@ -49,6 +49,19 @@ const editAccount = async (c: Context) => {
       throw new NotFoundError("Account not found");
     }
 
+    // Check for name collision if name is being changed
+    if (body.name && body.name !== account.name) {
+      const nameExists = await Account.findOne({
+        createdBy: userId,
+        name: body.name,
+        _id: { $ne: accountId },
+      }).session(session);
+
+      if (nameExists) {
+        throw new BadRequestError("You've used that name already");
+      }
+    }
+
     if (
       body.isDefault === false &&
       user.defaultAccount?.toString() === accountId
