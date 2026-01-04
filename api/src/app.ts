@@ -9,6 +9,7 @@ import accountRoutes from "./features/accounts/routes/_account.routes";
 import billRoutes from "./features/bills/routes/_bill.routes";
 import expenseRoutes from "./features/expenses/routes/_expense.routes";
 import savingsRoutes from "./features/savings/routes/_savings.routes";
+import updateAmountRoutes from "./features/shared/amounts/routes/updateAmount.routes";
 
 const isNetworkDevelopmentMode =
   process.env.NODE_ENV === "development" && process.argv.includes("--host");
@@ -42,6 +43,7 @@ export const createApp = () => {
   app.route("/api/bills", billRoutes);
   app.route("/api/expenses", expenseRoutes);
   app.route("/api/savings", savingsRoutes);
+  app.route("/api/update-amount", updateAmountRoutes);
 
   // Welcome / Health check route
   app.get("/", (c) =>
