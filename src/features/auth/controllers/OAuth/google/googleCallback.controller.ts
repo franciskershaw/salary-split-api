@@ -1,17 +1,16 @@
 import { Context } from "hono";
-import { googleProvider } from "../../../utils/auth.providers";
-import { deleteCookie, getCookie } from "hono/cookie";
+import { deleteCookie, getCookie, setCookie } from "hono/cookie";
 import {
   BadRequestError,
   UnauthorizedError,
 } from "../../../../../core/utils/errors";
 import User from "../../../../users/model/user.model";
 import { generateRefreshToken } from "../../../../../core/utils/jwt";
-import { setCookie } from "hono/cookie";
 import {
   REFRESH_TOKEN_COOKIE_NAME,
   REFRESH_TOKEN_COOKIE_OPTIONS,
 } from "../../../../../core/utils/constants";
+import { exchangeGoogleCodeForTokens } from "../../../../../core/utils/oauth";
 
 export const googleCallback = async (c: Context) => {
   const code = c.req.query("code");
@@ -30,13 +29,17 @@ export const googleCallback = async (c: Context) => {
     throw new BadRequestError("Invalid OAuth state");
   }
 
+  // Clean up cookies immediately after validation
   deleteCookie(c, "google_oauth_state");
   deleteCookie(c, "google_oauth_code_verifier");
 
-  // Exchange code for tokens using Arctic
-  const tokens = await googleProvider.validateAuthorizationCode(
+  // Exchange code for tokens
+  const tokens = await exchangeGoogleCodeForTokens(
     code,
-    codeVerifier
+    codeVerifier,
+    process.env.GOOGLE_CLIENT_ID!,
+    process.env.GOOGLE_CLIENT_SECRET!,
+    process.env.GOOGLE_REDIRECT_URI!
   );
 
   // Get user info from Google
@@ -44,7 +47,7 @@ export const googleCallback = async (c: Context) => {
     "https://www.googleapis.com/oauth2/v2/userinfo",
     {
       headers: {
-        Authorization: `Bearer ${tokens.accessToken()}`,
+        Authorization: `Bearer ${tokens.accessToken}`,
       },
     }
   );

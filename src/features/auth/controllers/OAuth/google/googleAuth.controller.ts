@@ -1,15 +1,23 @@
 import { Context } from "hono";
-import { googleProvider } from "../../../utils/auth.providers";
-import { generateState, generateCodeVerifier } from "arctic";
 import { setCookie } from "hono/cookie";
+import {
+  generateState,
+  generateCodeVerifier,
+  generateCodeChallenge,
+  createGoogleAuthorizationURL,
+} from "../../../../../core/utils/oauth";
 
 export const googleAuth = async (c: Context) => {
   const state = generateState();
   const codeVerifier = generateCodeVerifier();
+  const codeChallenge = generateCodeChallenge(codeVerifier);
   const scopes = ["openid", "profile", "email"];
-  const url = googleProvider.createAuthorizationURL(
+
+  const url = createGoogleAuthorizationURL(
+    process.env.GOOGLE_CLIENT_ID!,
+    process.env.GOOGLE_REDIRECT_URI!,
     state,
-    codeVerifier,
+    codeChallenge,
     scopes
   );
 
