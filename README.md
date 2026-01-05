@@ -1,6 +1,6 @@
 # Salary Split API
 
-A REST API performing CRUD actions for the SalarySplit app, designed to help users organise their monthly salary distribution across bills, expenses, savings, and multiple accounts. The frontend, which this API serves, is in [this repository](https://github.com/franciskershaw/salary-split)
+A REST API built using Hono performing CRUD actions for the SalarySplit app, designed to help users organise their monthly salary distribution across bills, expenses, savings, and multiple accounts. The frontend, which this API serves, is in [this repository](https://github.com/franciskershaw/salary-split)
 
 ## Purpose
 
