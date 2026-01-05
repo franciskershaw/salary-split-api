@@ -1,13 +1,16 @@
 // src/core/middleware/error.middleware.ts
 import { ErrorHandler } from "hono";
 import { HTTPException } from "hono/http-exception";
-import { UnauthorizedError } from "../utils/errors";
+import { InternalServerError, UnauthorizedError } from "../utils/errors";
 import dayjs from "dayjs";
 import { ZodError } from "zod";
 
 export const errorHandler: ErrorHandler = (err, c) => {
   // Log in development
-  if (process.env.NODE_ENV === "development") {
+  if (
+    process.env.NODE_ENV === "development" ||
+    err instanceof InternalServerError
+  ) {
     console.log(dayjs().format("MMM D YYYY, h:mm:ss a"), err);
   }
 
