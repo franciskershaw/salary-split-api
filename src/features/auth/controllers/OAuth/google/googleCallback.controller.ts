@@ -1,5 +1,5 @@
 import { Context } from "hono";
-import { getGoogleProvider } from "../../../utils/auth.providers";
+import { googleProvider } from "../../../utils/auth.providers";
 import { deleteCookie, getCookie } from "hono/cookie";
 import {
   BadRequestError,
@@ -34,7 +34,6 @@ export const googleCallback = async (c: Context) => {
   deleteCookie(c, "google_oauth_code_verifier");
 
   // Exchange code for tokens using Arctic
-  const googleProvider = await getGoogleProvider();
   const tokens = await googleProvider.validateAuthorizationCode(
     code,
     codeVerifier
